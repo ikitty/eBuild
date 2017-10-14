@@ -15,7 +15,7 @@
 
 <style>
 * {margin: 0;padding: 0;}
-body {font: 400 14px/1.5 'Source Code Pro', Arial;}
+body {font: 400 14px/1.5 'Source Code Pro', 'Microsoft Yahei', Arial;}
 a {text-decoration: none; color: #333 }
 a:hover {color:#000}
 </style>

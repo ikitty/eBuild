@@ -27,7 +27,7 @@
     .header {height:80px;padding:0px 20px;line-height:80px;border-bottom:1px solid #ddd;}
     .nav_logo {float:left;}
     .nav_logo .logo {float:left;height:35px;margin-top:22px;}
-    .nav_logo h3 {float:left;padding-left:10px;}
+    .nav_logo h3 {float:left;padding-left:10px;font-weight: normal;}
 
     .nav_right {float:right;}
     .nav_right a {float:left;padding:0px 10px;}

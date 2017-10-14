@@ -37,6 +37,8 @@
         ,methods: {
             createProj() {
                 let projData = {name: this.projname, path: this.projpath}
+                let store = window.localStorage ; 
+                store.setItem('eBuild', JSON.stringify(projData))
                 console.log('clicked', JSON.stringify(projData) )
             }
         }
