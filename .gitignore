@@ -10,4 +10,4 @@ thumbs.db
 !.gitkeep
 
 .travis.yml
-.appveyor.yml
+appveyor.yml
