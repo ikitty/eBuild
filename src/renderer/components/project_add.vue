@@ -27,6 +27,7 @@
 </template>
 
 <script>
+    const store = window.localStorage
     export default {
         data(){
             return {
@@ -36,10 +37,14 @@
         }
         ,methods: {
             createProj() {
+                let eBuildData = store.getItem('eBuild')
+                eBuildData = JSON.parse(eBuildData) || []
                 let projData = {name: this.projname, path: this.projpath}
-                let store = window.localStorage ; 
-                store.setItem('eBuild', JSON.stringify(projData))
-                console.log('clicked', JSON.stringify(projData) )
+                eBuildData.push(projData)
+                store.setItem('eBuild', JSON.stringify(eBuildData))
+                console.log('clicked', JSON.stringify(eBuildData) )
+                
+                this.$router.push({name: 'projectList'})
             }
         }
     }
