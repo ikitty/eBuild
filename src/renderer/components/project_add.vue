@@ -1,49 +1,67 @@
 <template>
 <div class="project_add">
+    <div class="mod_tit">创建项目</div>
     <div class="row">
-        <p class="row_hd">模版：</p>
+        <p class="row_hd">选择模版</p>
         <div class="row_bd">
-            <select name="" ><option>官网模板</option></select>
+            <el-select v-model="projtemplate" class="sel" placeholder="请选择模板">
+                <el-option v-for="item in templates" :key="item.value" :label="item.label" :value="item.value">
+                </el-option>
+            </el-select>
         </div>
     </div>
     <div class="row">
-        <p class="row_hd">名称 (请输入项目名称，如a20171013xycq)</p>
+        <p class="row_hd">活动名称 (如: a20171013wuxia)</p>
         <div class="row_bd">
-            <input type="text" v-model="projname">
+            <el-input v-model="projName" ></el-input>
         </div>
     </div>
     <div class="row">
-        <p class="row_hd">路径：</p>
+        <p class="row_hd">项目生成路径 (默认生成到全局工具目录)</p>
         <div class="row_bd">
-            <input type="text" v-model="projpath">
+            <el-input v-model="projPath" ></el-input>
         </div>
     </div>
     <div class="row">
         <div class="row_btn">
-            <span class="btn" @click="createProj">创建项目</span>
+            <el-button type="primary" @click="createProj">创建项目</el-button>
+            <router-link to="/">
+                <el-button >取消</el-button>
+            </router-link>
         </div>
     </div>
 </div>
 </template>
 
 <script>
+    import {mapMutations } from 'vuex'
     const store = window.localStorage
+
     export default {
         data(){
             return {
-                projname: '',
-                projpath: ''
+                projName: '',
+                projPath: '',
+                projtemplate: '',
+                templates: [
+                    {value:'templateDefault',label:'默认活动模板'},
+                    {value:'templateXycq',label:'轩辕传奇手游活动模板'}
+                ]
             }
         }
+        ,created(){
+        }
         ,methods: {
-            createProj() {
+            ...mapMutations(['addCount'])
+            ,createProj() {
                 let eBuildData = store.getItem('eBuild')
                 eBuildData = JSON.parse(eBuildData) || []
-                let projData = {name: this.projname, path: this.projpath}
+                let projData = {name: this.projName, path: this.projPath}
                 eBuildData.push(projData)
                 store.setItem('eBuild', JSON.stringify(eBuildData))
-                console.log('clicked', JSON.stringify(eBuildData) )
-                
+                //console.log('clicked', JSON.stringify(eBuildData) )
+
+                this.addCount(5);
                 this.$router.push({name: 'projectList'})
             }
         }
@@ -51,13 +69,13 @@
 </script>
 
 <style scoped>
-    .project_add {width: 500px;margin: 0 auto;padding: 20px 0; }
-    .project_add .row_hd {color: #666;padding: 8px 0;}
-    .project_add .row select,
-    .project_add .row input {padding: 5px;border:1px solid #bbb;border-radius: 2px; }
-    .project_add .row input {width: 300px;}
-    .project_add .row_btn {padding: 20px 0 0;}
+    .mod_tit {padding-top: 20px;font-size: 22px;padding-bottom:10px;color: #555;}
+    .project_add {width: 500px;margin: 0 auto;padding: 20px 0; font-size: 14px;}
+    .project_add .row {margin: 10px 0;}
+    .project_add .row_hd {color: #999;padding: 5px 0;}
+    .project_add .row_btn {padding: 15px 0 0;}
+    .project_add .row_btn button {margin-right: 10px;}
+    .project_add .sel {width:100%;}
 
-    .btn {display: inline-block;padding: 8px 15px; background: #39f;color: #fff;}
 </style>
 

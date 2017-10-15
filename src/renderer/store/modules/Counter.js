@@ -9,6 +9,8 @@ const mutations = {
   INCREMENT_MAIN_COUNTER (state) {
     state.main++
   }
+  ,addCount (state,n){ state.main+=n }
+  ,minus_count (state){ state.main-- }
 }
 
 const actions = {

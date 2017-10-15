@@ -1,7 +1,10 @@
 <template>
     <div id="app">
         <hd></hd>
-        <router-view></router-view>
+        <transition name="fade" mode="out-in">
+            <router-view class="fade"></router-view>
+        </transition>
+
     </div>
 </template>
 
@@ -15,7 +18,11 @@
 
 <style>
 * {margin: 0;padding: 0;}
-body {font: 400 14px/1.5 'Source Code Pro', 'Microsoft Yahei', Arial;}
-a {text-decoration: none; color: #333 }
+body {font: 400 14px/1.5 'Microsoft Yahei', Arial;}
+a {text-decoration: none; color: #555 }
 a:hover {color:#000}
+
+.fade {transition: all 0.2s ease;}
+.fade-leave-active {opacity:0.0}
+.fade-enter-active {opacity:1}
 </style>

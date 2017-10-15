@@ -7,6 +7,8 @@
 </template>
 
 <script>
+    import {mapState} from 'vuex'
+
     const store = window.localStorage
     export default {
         data(){
@@ -14,10 +16,14 @@
                 projList: []
             }
         }
+        ,computed: mapState({
+            count: state => state.Counter.main
+        })
         ,created(){
             let D = store.getItem('eBuild')
             D = JSON.parse(D) || []
             this.projList = D
+            console.log('hi count', this.count )
         }
         ,methods: {
         }
