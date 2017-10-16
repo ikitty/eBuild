@@ -11,7 +11,11 @@
 
 <script>
     export default {
-        methods: {
+        created(){
+               
+        }
+        ,methods: {
+
         }
     }
 </script>
