@@ -30,13 +30,12 @@
                 </router-link>
             </div>
 
-            <br></br>
-            <span>test data:</span>
+            <br><hr>
+            <span>here are some test data:</span>
+            <el-button @click="testAdd">testAdd</el-button> <el-button @click="testMinus">testMinus</el-button>
             <ul>
                 <li v-for="item in count" :key="item.name">{{item.name}} at: [{{item.path}}]</li>
             </ul>
-            <el-button @click="testAdd">testAdd</el-button>
-            <el-button @click="testMinus">testMinus</el-button>
 
         </div>
     </div>
