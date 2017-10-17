@@ -21,6 +21,7 @@
 body {font: 400 14px/1.5 'Microsoft Yahei', Arial;}
 a {text-decoration: none; color: #555 }
 a:hover {color:#000}
+.hide {display: none;}
 
 .fade {transition: all 0.2s ease;}
 .fade-leave-active {opacity:0.0}

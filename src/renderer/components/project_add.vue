@@ -69,12 +69,12 @@
             })
         }
         ,methods: {
-            ...mapMutations(['AddCount', 'MinusCount'])
+            ...mapMutations(['AddCount', 'RemoveCount'])
             ,testAdd(){
                 this.AddCount({name: 'a2017-' + Math.ceil(Math.random()*1e5), path: 'testPath'});
             }
             ,testMinus(){
-                this.MinusCount();
+                this.RemoveCount();
             }
             ,createProj() {
                 if (!this.projName || !this.projPath){
@@ -90,38 +90,16 @@
 </script>
 
 <style scoped>
-    .mod_tit {
-        padding-top: 20px;
-        font-size: 22px;
-        padding-bottom: 10px;
-        color: #555;
-    }
+    .mod_tit { padding-top: 20px; font-size: 22px; padding-bottom: 10px; color: #555; }
     
-    .project_add {
-        width: 500px;
-        margin: 0 auto;
-        padding: 20px 0;
-        font-size: 14px;
-    }
+    .project_add { width: 500px; margin: 0 auto; padding: 20px 0; font-size: 14px; }
     
-    .project_add .row {
-        margin: 10px 0;
-    }
+    .project_add .row { margin: 10px 0; }
     
-    .project_add .row_hd {
-        color: #999;
-        padding: 5px 0;
-    }
+    .project_add .row_hd { color: #999; padding: 5px 0; }
     
-    .project_add .row_btn {
-        padding: 15px 0 0;
-    }
+    .project_add .row_btn { padding: 15px 0 0; } 
+    .project_add .row_btn button { margin-right: 10px; }
     
-    .project_add .row_btn button {
-        margin-right: 10px;
-    }
-    
-    .project_add .sel {
-        width: 100%;
-    }
+    .project_add .sel { width: 100%; }
 </style>

@@ -11,7 +11,7 @@
         <span class="gap">|</span>
         <router-link to="/setting">全局设置</router-link>
         <span class="gap">|</span>
-        <a href="#">其他工具</a>
+        <router-link to="/">其他工具</router-link>
         <span class="gap">|</span>
         <a href="javascript:;" @click="open('http://tgideas.qq.com')">关于</a>       
     </div>
