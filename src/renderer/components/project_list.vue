@@ -28,6 +28,7 @@
 <script>
     import {mapState} from 'vuex'
     import {mapMutations} from 'vuex'
+    import {exec} from 'child_process'
 
     const store = window.localStorage
     export default {
@@ -57,7 +58,15 @@
                     this.$alert('choose a project plz :)', '提示');
                     return
                 }
-                this.$alert('create local server for: ' + this.curProject.name , '提示' );
+                //npm run try
+                // exec('num run try') ;
+                // const term = exec('webpack --config  D:\\github\\eBuild\\.electron-vue\\testwp.config.js' , {
+                    // cwd: 'D:\\ztest\\eBuildDir'
+                // })
+                // term.stdout.on('data', function(d){
+                    // console.log('terminal stdout data : ', d)
+                // })
+                //this.$alert('create local server for: ' + this.curProject.name , '提示' );
             }
             ,removeFocusState(e){
                 //remove btn focus status to disable focus style  (bad design in element-ui)
