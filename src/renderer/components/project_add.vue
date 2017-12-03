@@ -16,12 +16,12 @@
                 <el-input v-model="projName"></el-input>
             </div>
         </div>
-        <div class="row">
+        <!-- <div class="row">
             <p class="row_hd">项目生成路径 (默认生成到全局工具目录)</p>
             <div class="row_bd">
                 <el-input v-model="projPath"></el-input>
             </div>
-        </div>
+        </div> -->
         <div class="row">
             <div class="row_btn">
                 <el-button type="primary" @click="createProj">创建项目</el-button>
@@ -32,7 +32,7 @@
 
             <br><hr>
             <span>here are some test data:</span>
-            <el-button @click="testAdd">testAdd</el-button> <el-button @click="testMinus">testMinus</el-button>
+            <el-button @click="testMinus">testMinus</el-button>
             <ul>
                 <li v-for="item in count" :key="item.name">{{item.name}} at: [{{item.path}}]</li>
             </ul>
@@ -42,8 +42,10 @@
 </template>
 
 <script>
-    import {mapState} from 'vuex'
+    import {mapState, mapActions} from 'vuex'
     import {mapMutations } from 'vuex'
+    import gulp from 'gulp'
+    import path from 'path'
 
     export default {
         data(){
@@ -65,22 +67,28 @@
                     console.log('Computed State:', state)
                     return state.Core.project_list
                 }
+                ,wkdir: (state)=>{
+                    return state.Core.working_dir
+                }
             })
         }
         ,methods: {
-            ...mapMutations(['AddCount', 'RemoveCount'])
-            ,testAdd(){
-                this.AddCount({name: 'a2017-' + Math.ceil(Math.random()*1e5), path: 'testPath'});
-            }
+            ...mapMutations(['RemoveCount'])
+            ,...mapActions(['addProj'])
             ,testMinus(){
                 this.RemoveCount();
             }
             ,createProj() {
-                if (!this.projName || !this.projPath){
+                if (!this.projName ){
                     this.$alert('请输入字段内容', '提示' );
                     return
                 }
-                this.AddCount({name: this.projName, path: this.projPath });
+                gulp.src(path.join(__dirname, '../template/event/**/*'))
+                    .pipe(gulp.dest(this.wkdir + this.projName + '/'))
+                    .on('end', function () {
+                        console.log('copy ok');
+                    })
+                this.addProj({name: this.projName, path: 'tempPath' });
 
                 this.$router.push({name: 'projectList'})
             }

@@ -28,6 +28,8 @@
 <script>
     import {mapState, mapMutations} from 'vuex'
     import {exec} from 'child_process'
+    import gulp from 'gulp'
+    import util from '../utils/index'
 
     const store = window.localStorage
     export default {
@@ -42,6 +44,7 @@
             ...mapState({
                 curProject: (state) => state.Core.current_project
                 ,projList: (state) => state.Core.project_list
+                ,wkdir: (state)=>{ return state.Core.working_dir }
 
             })    
         }
@@ -57,13 +60,15 @@
                     this.$alert('choose a project plz :)', '提示');
                     return
                 }
-                //npm run try
-                // exec('num run try') ;
-                // const term = exec('webpack --config  D:\\github\\eBuild\\.electron-vue\\testwp.config.js' , {
-                    // cwd: 'D:\\ztest\\eBuildDir'
-                // })
+
+                util('/Users/alex/Desktop/ztemp/aDateEvt/src/**/*', function(){
+                    console.log('p list ok');
+                })
+
+                    
+                // const term = exec('gulp -v')
                 // term.stdout.on('data', function(d){
-                    // console.log('terminal stdout data : ', d)
+                //     console.log('terminal stdout data : ', d)
                 // })
                 this.$alert('create local server for: ' + this.curProject.name , '提示' );
             }
