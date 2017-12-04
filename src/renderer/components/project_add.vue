@@ -4,7 +4,7 @@
         <div class="row">
             <p class="row_hd">选择模版</p>
             <div class="row_bd">
-                <el-select v-model="projtemplate" class="sel" placeholder="请选择模板">
+                <el-select v-model="taskTemplate" class="sel" placeholder="请选择模板">
                     <el-option v-for="item in templates" :key="item.value" :label="item.label" :value="item.value">
                     </el-option>
                 </el-select>
@@ -13,15 +13,19 @@
         <div class="row">
             <p class="row_hd">活动名称 (如: a20171013wuxia)</p>
             <div class="row_bd">
-                <el-input v-model="projName"></el-input>
+                <el-input v-model="taskName"></el-input>
             </div>
         </div>
-        <!-- <div class="row">
+        <div class="row">
             <p class="row_hd">项目生成路径 (默认生成到全局工具目录)</p>
             <div class="row_bd">
-                <el-input v-model="projPath"></el-input>
+                <span class="btn_apply" >
+                    <span >{{working_dir}} </span>
+                    <input type="file" @change="choosePath($event)" webkitdirectory >
+                </span>
+                <!-- <el-input v-model="working_dir"></el-input> -->
             </div>
-        </div> -->
+        </div>
         <div class="row">
             <div class="row_btn">
                 <el-button type="primary" @click="createProj">创建项目</el-button>
@@ -29,30 +33,21 @@
                     <el-button>取消</el-button>
                 </router-link>
             </div>
-
-            <br><hr>
-            <span>here are some test data:</span>
-            <el-button @click="testMinus">testMinus</el-button>
-            <ul>
-                <li v-for="item in count" :key="item.name">{{item.name}} at: [{{item.path}}]</li>
-            </ul>
-
         </div>
     </div>
 </template>
 
 <script>
-    import {mapState, mapActions} from 'vuex'
-    import {mapMutations } from 'vuex'
+    import {mapGetters, mapActions} from 'vuex'
     import gulp from 'gulp'
     import path from 'path'
 
     export default {
         data(){
             return {
-                projName: '',
-                projPath: '',
-                projtemplate: '',
+                taskName: '',
+                taskPath: '',
+                taskTemplate: '',
                 templates: [
                     {value:'templateDefault',label:'默认活动模板'},
                     {value:'templateXycq',label:'轩辕传奇手游活动模板'}
@@ -62,35 +57,30 @@
         ,created(){
         }
         ,computed: {
-            ...mapState({
-                count: (state)=> {
-                    console.log('Computed State:', state)
-                    return state.Core.project_list
-                }
-                ,wkdir: (state)=>{
-                    return state.Core.working_dir
-                }
-            })
+            ...mapGetters(['working_dir'])
         }
         ,methods: {
-            ...mapMutations(['RemoveCount'])
-            ,...mapActions(['addProj'])
-            ,testMinus(){
-                this.RemoveCount();
-            }
+            ...mapActions(['addTask' , 'setWorkingDir'])
             ,createProj() {
-                if (!this.projName ){
+                if (!this.taskName ){
                     this.$alert('请输入字段内容', '提示' );
                     return
                 }
-                gulp.src(path.join(__dirname, '../template/event/**/*'))
-                    .pipe(gulp.dest(this.wkdir + this.projName + '/'))
-                    .on('end', function () {
-                        console.log('copy ok');
-                    })
-                this.addProj({name: this.projName, path: 'tempPath' });
+                // gulp.src(path.join(__dirname, '../template/event/**/*'))
+                //     .pipe(gulp.dest(this.wkdir + this.taskName + '/'))
+                //     .on('end', function () {
+                //         console.log('copy ok');
+                //     })
+                this.addTask({name: this.taskName, path: this.working_dir + '/' + this.taskName + '/'});
 
                 this.$router.push({name: 'projectList'})
+            }
+            ,choosePath(e){
+                let files = e.target.files
+                if (files[0]) {
+                    let dir = files[0].path
+                    this.setWorkingDir(dir)
+                }
             }
         }
     }
@@ -109,4 +99,8 @@
     .project_add .row_btn button { margin-right: 10px; }
     
     .project_add .sel { width: 100%; }
+
+
+.btn_apply {position: relative; display: inline-block;width: 500px;height: 35px;background: #fff;border: 1px solid #BFCBD9;line-height: 35px;border-radius: 3px;box-sizing: border-box;text-indent: 10px;}
+.btn_apply input {position: absolute;top:0;left: 0;width: 100%;height: 100%;opacity: 0;overflow: hidden;cursor: pointer;}
 </style>

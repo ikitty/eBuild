@@ -4,7 +4,7 @@
         <div class="side_hd">项目列表 <span>&gt;&gt;</span></div>
         <div class="side_list_wrap">
             <ul class="side_list">
-                <li v-for="(item, index) in projList" :key="index" :class="item.name === curProject.name ? 'click' : '' " @click="projectItemClick(item)">&bull;&nbsp; {{item.name}}</li>
+                <li v-for="(item, index) in task_list" :key="index" :class="item.name === current_task.name ? 'click' : '' " @click="taskItemClick(item)">&bull;&nbsp; {{item.name}}</li>
             </ul>
         </div>
     </div>
@@ -15,7 +15,7 @@
             <el-button type="" icon="check">检测</el-button>
             <el-button type="" icon="upload2">同步</el-button>
             <el-button type="" icon="setting">设置</el-button>
-            <el-button type="danger" icon="delete2">删除</el-button>
+            <el-button type="danger" @click="removeTask" icon="delete2">删除</el-button>
         </div>
         <div class="hide_input_wrap">
             <input type="button" id="hideInput" class="" value=""/>
@@ -26,7 +26,7 @@
 </template>
 
 <script>
-    import {mapState, mapMutations} from 'vuex'
+    import { mapGetters, mapActions} from 'vuex'
     import {exec} from 'child_process'
     import gulp from 'gulp'
     import util from '../utils/index'
@@ -41,36 +41,30 @@
             }
         }
         ,computed: {
-            ...mapState({
-                curProject: (state) => state.Core.current_project
-                ,projList: (state) => state.Core.project_list
-                ,wkdir: (state)=>{ return state.Core.working_dir }
-
-            })    
+            ...mapGetters(['current_task', 'task_list'])
         }
         ,created(){
         }
         ,methods: {
-            ...mapMutations(['SetCurrentProject'])
-            ,projectItemClick(proj){
-                this.SetCurrentProject(proj)
+            ...mapActions(['delTask', 'setCurrentTask'])
+            ,taskItemClick(item){
+                this.setCurrentTask(item)
             }
             ,localServe(){
-                if (!this.curProject.name ){
-                    this.$alert('choose a project plz :)', '提示');
+                if (!this.current_task.name ){
+                    this.$alert('choose a task plz :)', '提示');
                     return
                 }
 
-                util('/Users/alex/Desktop/ztemp/aDateEvt/src/**/*', function(){
-                    console.log('p list ok');
-                })
-
-                    
-                // const term = exec('gulp -v')
-                // term.stdout.on('data', function(d){
-                //     console.log('terminal stdout data : ', d)
+                // util('/Users/alex/Desktop/ztemp/aDateEvt/src/**/*', function(){
+                //     console.log('p list ok');
                 // })
-                this.$alert('create local server for: ' + this.curProject.name , '提示' );
+
+                this.$alert('create local server for: ' + this.current_task.name , '提示' );
+            }
+            ,removeTask(){
+                this.delTask(this.current_task)
+                this.$alert('成功删除: ' + this.current_task.name , '提示' );
             }
             ,removeFocusState(e){
                 //remove btn focus status to disable focus style  (bad design in element-ui)

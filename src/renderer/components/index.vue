@@ -14,20 +14,20 @@
 </template>
 
 <script>
-import {mapState, mapActions} from 'vuex'
+import {mapGetters, mapActions} from 'vuex'
 
 export default {
     created(){
             
     }
     ,methods: {
-        ...mapActions(['AddProj'])
+        ...mapActions(['addTask'])
 
         ,applyProject(e){
             let files = e.target.files
             if (files[0]) {
                 let D = {name: files[0].name, path: files[0].path} 
-                this.AddProj(D)
+                this.addTask(D)
             }
         }
     }

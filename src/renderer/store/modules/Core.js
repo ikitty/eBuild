@@ -1,4 +1,4 @@
-import { resolve } from "url";
+// import { resolve } from "url";
 
 const STORAGE_KEY = 'eBuild'
 const Store = window.localStorage
@@ -14,30 +14,53 @@ const LS = {
 
 let defState = LS.get()
 const state = {
-    project_list: defState.project_list || []
-    ,current_project: defState.current_project || {}
-    ,working_dir: '/Users/alex/Desktop/ztemp/' //todo set
+    task_list: defState.task_list || []
+    ,current_task: defState.current_task || {}
+    ,working_dir: defState.working_dir || '/Users/alex/Desktop/ztemp/' //todo set get default desktop dir
 }
 
 const mutations = {
-    AddProj (state, proj){ 
-        state.project_list = [...state.project_list, proj]
+    AddTask (state, task){ 
+        state.task_list.push(task)
         LS.set(state)
     }
-    ,RemoveCount (state, proj){ 
-        state.project_list.shift()
+    ,DelTask (state, task){ 
+        //todo delete by name and path
+        state.task_list = state.task_list.filter(item=>item.name != task.name)
         LS.set(state)
     }
-    ,SetCurrentProject(state, cur_project){
-        state.current_project = cur_project
-        //todo save
+    ,SetCurrentTask(state, task){
+        state.current_task = task
+        LS.set(state)
+    }
+    ,SetWorkingDir(state, dir){
+        state.working_dir = dir
+        LS.set(state)
     }
 }
 
 const actions = {
-    addProj({commit}, proj){
+    addTask({commit}, task){
         return new Promise((resolve, reject)=>{
-            commit('AddProj', proj)
+            commit('AddTask', task)
+            resolve()
+        })
+    }
+    ,delTask({commit}, task){
+        return new Promise((resolve, reject)=>{
+            commit('DelTask', task)
+            resolve()
+        })
+    }
+    ,setCurrentTask({commit}, task){
+        return new Promise((resolve, reject)=>{
+            commit('SetCurrentTask', task)
+            resolve()
+        })
+    }
+    ,setWorkingDir({commit}, dir){
+        return new Promise((resolve, reject)=>{
+            commit('SetWorkingDir', dir)
             resolve()
         })
     }

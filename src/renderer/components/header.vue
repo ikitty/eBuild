@@ -19,7 +19,7 @@
 </template>
 
 <script>
-    import {mapState} from 'vuex'
+    import {mapGetters} from 'vuex'
    
     export default {
         data(){
@@ -28,15 +28,12 @@
             }
         },
         computed: {
-            ...mapState({
-                project_list: (state) =>state.Core.project_list
-            })
+            ...mapGetters(['task_list'])
             ,logoLink: function(){
-                return this.project_list.length > 0 ? '/project_list' : '/'
+                return this.task_list.length > 0 ? '/project_list' : '/'
             }
         },
         created(){
-                console.log(this.logoLink)
         },
         methods: {
             open(link) {
