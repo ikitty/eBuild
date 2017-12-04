@@ -2,7 +2,7 @@
 
 import gulp from 'gulp'
 import path from 'path'
-import devTask from './devTask'
+import {devTask} from './devTask'
 
 const tempPath = path.join(__dirname, '../template/event/**/*')
 const createTask = (targetPath)=> {
@@ -13,9 +13,8 @@ const createTask = (targetPath)=> {
         })
 }
 
-console.log('util index', devTask);
 
 export default {
     createTask,
-    devTask: devTask.devTask
+    devTask
 }

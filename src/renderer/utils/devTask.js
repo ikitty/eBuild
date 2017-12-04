@@ -178,7 +178,8 @@ const devTask = (taskPath, cb)=>{
                 baseDir: paths.dev.dir,
                 directory: true
             },
-            startPath: "/html",
+            //todo fileExist html or htm
+            startPath: "/html/index.html",
             port: 8088,
             reloadDelay: 0,
             timestamps: true,
@@ -242,6 +243,8 @@ const devTask = (taskPath, cb)=>{
 
 // export default {devTask}
 
-export default {
+//如果是这样单个导出（没有default keyword） 那么import时 需要使用{}
+//如果是export default {},那么import时是不能使用{}单独导入某个接口的
+export {
     devTask
 }
