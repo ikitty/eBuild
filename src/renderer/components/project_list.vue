@@ -29,7 +29,7 @@
     import { mapGetters, mapActions} from 'vuex'
     import {exec} from 'child_process'
     import gulp from 'gulp'
-    import util from '../utils/index'
+    import util from '@/utils/'
 
     const store = window.localStorage
     export default {
@@ -56,15 +56,16 @@
                     return
                 }
 
-                // util('/Users/alex/Desktop/ztemp/aDateEvt/src/**/*', function(){
-                //     console.log('p list ok');
-                // })
+                let path = this.current_task.path
+                
+                util.devTask(path)
 
                 this.$alert('create local server for: ' + this.current_task.name , '提示' );
             }
             ,removeTask(){
                 this.delTask(this.current_task)
                 this.$alert('成功删除: ' + this.current_task.name , '提示' );
+                //todo remove src
             }
             ,removeFocusState(e){
                 //remove btn focus status to disable focus style  (bad design in element-ui)

@@ -39,18 +39,17 @@
 
 <script>
     import {mapGetters, mapActions} from 'vuex'
-    import gulp from 'gulp'
-    import path from 'path'
+    import util from '@/utils/'
 
     export default {
         data(){
             return {
                 taskName: '',
                 taskPath: '',
-                taskTemplate: '',
+                taskTemplate: 'templateDefault',
                 templates: [
                     {value:'templateDefault',label:'默认活动模板'},
-                    {value:'templateXycq',label:'轩辕传奇手游活动模板'}
+                    // {value:'templateXycq',label:'轩辕传奇手游活动模板'}
                 ]
             }
         }
@@ -66,12 +65,9 @@
                     this.$alert('请输入字段内容', '提示' );
                     return
                 }
-                // gulp.src(path.join(__dirname, '../template/event/**/*'))
-                //     .pipe(gulp.dest(this.wkdir + this.taskName + '/'))
-                //     .on('end', function () {
-                //         console.log('copy ok');
-                //     })
-                this.addTask({name: this.taskName, path: this.working_dir + '/' + this.taskName + '/'});
+                let path = this.working_dir + '/' + this.taskName + '/'
+                util.createTask(path)
+                this.addTask({name: this.taskName, path: path});
 
                 this.$router.push({name: 'projectList'})
             }

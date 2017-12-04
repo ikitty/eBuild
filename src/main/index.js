@@ -4,9 +4,17 @@ import { app, BrowserWindow } from 'electron'
  * Set `__static` path to static files in production
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
  */
+let appWidth = 770
+let appHeight = 520
+
 if (process.env.NODE_ENV !== 'development') {
-  global.__static = require('path').join(__dirname, '/static').replace(/\\/g, '\\\\')
+    global.__static = require('path').join(__dirname, '/static').replace(/\\/g, '\\\\')
+}else{
+    appWidth = 1100    
+    appHeight = 720    
 }
+
+
 
 let mainWindow
 const winURL = process.env.NODE_ENV === 'development'
@@ -18,9 +26,9 @@ function createWindow () {
    * Initial window options
    */
   mainWindow = new BrowserWindow({
-    height: 520,
+    height: appHeight,
     useContentSize: true,
-    width: 770
+    width: appWidth
   })
 
   mainWindow.loadURL(winURL)
