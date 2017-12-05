@@ -3,9 +3,6 @@
     <router-link to="/project_add">
         <el-button type="primary" class="btn" >创建项目</el-button>
     </router-link>
-    <!-- <router-link to="/project_import"> -->
-        <!-- <el-button type="primary" class="btn" >关联项目</el-button> -->
-    <!-- </router-link> -->
     <span class="btn_apply" >
         <input type="file" @change="applyProject($event)" webkitdirectory multiple>
         关联项目

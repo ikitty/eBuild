@@ -60,7 +60,7 @@
                 
                 util.devTask(path)
 
-                this.$alert('create local server for: ' + this.current_task.name , '提示' );
+                // this.$alert('create local server for: ' + this.current_task.name , '提示' );
             }
             ,removeTask(){
                 this.delTask(this.current_task)

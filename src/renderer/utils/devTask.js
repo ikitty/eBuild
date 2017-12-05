@@ -5,27 +5,42 @@ import del from 'del'
 import async from 'async'
 import browserSync from 'browser-sync'
 
+const BS = browserSync.create();
+const startServer = function (rootPath, cb) {
+    console.log('Starting Local Server');
+    BS.init({
+        // server: {
+        //     baseDir: paths.dev.dir,
+        //     directory: true
+        // },
+        server: rootPath,
+        startPath: "/html/",
+        port: 8098,
+        reloadDelay: 0,
+        timestamps: true,
+        notify: {      
+            styles: [
+                "margin: 0", "padding: 5px", "position: fixed", "font-size: 12px", "z-index: 9999", "bottom: 2px", "right: 2px",
+                "background-color: #3399ff", "color: white", "text-align: center"
+            ]
+        }
+    });
+    cb();
+}
+
 const devTask = (taskPath, cb)=>{
-    // gulp.src(projPath)
-    //     .pipe(gulp.dest(devPath))
-    //     .on('end', function () {
-    //         console.log(`copy in util success.`);
-    //     });
-
-    const bs = browserSync.create();
-
     let paths = {
         src: {
             dir: path.join(taskPath, './src'),
-            css: path.join(taskPath, './src/css/**/*'),
             html: path.join(taskPath, './src/html/**/*'),
+            css: path.join(taskPath, './src/css/**/*'),
             js: path.join(taskPath, './src/js/**/*'),
             img: path.join(taskPath, './src/img/**/*')
         },
         dev: {
             dir: path.join(taskPath, './dev'),
-            css: path.join(taskPath, './dev/css'),
             html: path.join(taskPath, './dev/html'),
+            css: path.join(taskPath, './dev/css'),
             js: path.join(taskPath, './dev/js'),
             img: path.join(taskPath, './dev/img')
         }
@@ -43,13 +58,13 @@ const devTask = (taskPath, cb)=>{
             .on('end', function () {
                 console.log(`Copy ${type} success.`);
                 // log(`copy ${type} success.`);
-                cb ? cb() : reloadHandler();
+                // cb ? cb() : reloadHandler();
+                if (cb) {
+                    cb()
+                }else{
+                    // BS.reload()
+                }
             });
-    }
-
-    function reloadHandler() {
-        // bs.reload()
-        // config.livereload && bs.reload();
     }
 
     function compileLess(cb) {
@@ -71,25 +86,19 @@ const devTask = (taskPath, cb)=>{
     }
 
     function compileHtml(cb) {
-        //option base is required on LocalDev
         gulp.src(paths.src.html, {base: paths.src.dir})
-        // gulp.src(paths.src.html, {base: paths.src.dir})
             .pipe(gulp.dest(paths.dev.dir))
             .on('end', function () {
-                if (cb) {
-                    console.log('compile Html success.');
-                    // log('compile Html success.');
-                    cb && cb();
-                }
+                console.log('Compile Html OK.');
+                cb && cb();
+                BS.reload()
             })
     }
 
     //监听文件
     function watch(cb) {
         var watcher = gulp.watch([
-                paths.src.html,
-                paths.src.js,
-                paths.src.img
+                paths.src.html, paths.src.js, paths.src.img
             ],
             {ignored: /[\/\\]\./}
         );
@@ -97,17 +106,15 @@ const devTask = (taskPath, cb)=>{
         watcher
             .on('change', function (trans) {
                 console.log(trans.path + ' has been changed');
-                // log(file + ' has been changed');
                 watchHandler(trans.type, trans.path);
             })
+            //todo
             .on('add', function (file) {
                 console.log(file + ' has been added');
-                // log(file + ' has been added');
                 watchHandler('add', file);
             })
             .on('unlink', function (file) {
                 console.log(file + ' is deleted');
-                // log(file + ' is deleted');
                 watchHandler('removed', file);
             });
 
@@ -117,11 +124,9 @@ const devTask = (taskPath, cb)=>{
 
     function watchHandler(type, file) {
         let target = file.split('src')[1].match(/[\/\\](\w+)[\/\\]/);
-
         if (target.length && target[1]) {
             target = target[1];
         }
-
 
         switch (target) {
             case 'img':
@@ -156,7 +161,6 @@ const devTask = (taskPath, cb)=>{
                         // compileSass();
                     }
                 }
-
                 break;
 
             case 'html':
@@ -166,42 +170,9 @@ const devTask = (taskPath, cb)=>{
                 } else {
                     compileHtml();
                 }
-
                 break;
         }
-
     };
-
-    function startServer(cb) {
-        bs.init({
-            server: {
-                baseDir: paths.dev.dir,
-                directory: true
-            },
-            //todo fileExist html or htm
-            startPath: "/html/index.html",
-            port: 8088,
-            reloadDelay: 0,
-            timestamps: true,
-            notify: {      
-                styles: [
-                    "margin: 0",
-                    "padding: 5px",
-                    "position: fixed",
-                    "font-size: 12px",
-                    "z-index: 9999",
-                    "bottom: 0px",
-                    "right: 0px",
-                    "border-radius: 0",
-                    "background-color: rgba(255,100,33,0.8)",
-                    "color: white",
-                    "text-align: center"
-                ]
-            }
-        });
-
-        cb();
-    }
 
     async.series([
         function (next) {
@@ -227,24 +198,17 @@ const devTask = (taskPath, cb)=>{
             watch(next);
         },
         function (next) {
-            console.log('should start server', 1);
-            startServer(next);
+            startServer(paths.dev.dir, next);
         }
     ], function (error) {
         if (error) {
             throw new Error(error);
         }
-
-        // callback && callback();
     });
 
     cb && cb()
 }
 
-// export default {devTask}
-
 //如果是这样单个导出（没有default keyword） 那么import时 需要使用{}
 //如果是export default {},那么import时是不能使用{}单独导入某个接口的
-export {
-    devTask
-}
+export { devTask }
