@@ -4,6 +4,7 @@ import path from 'path'
 import del from 'del'
 import async from 'async'
 import browserSync from 'browser-sync'
+import gulpWatch from 'gulp-watch'
 
 const BS = browserSync.create();
 const startServer = function (rootPath, cb) {
@@ -97,6 +98,9 @@ const devTask = (taskPath, cb)=>{
 
     //监听文件
     function watch(cb) {
+        gulpWatch([paths.src.html], function(arg){
+            console.log('gwatch file change', arg.event, arg.history[0]);
+        })
         var watcher = gulp.watch([
                 paths.src.html, paths.src.js, paths.src.img
             ],
