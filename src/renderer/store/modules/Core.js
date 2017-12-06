@@ -16,7 +16,8 @@ let defState = LS.get()
 const state = {
     task_list: defState.task_list || []
     ,current_task: defState.current_task || {}
-    ,working_dir: defState.working_dir || '/Users/alex/Desktop/ztemp/' //todo set get default desktop dir
+    ,working_dir: defState.working_dir || '' //todo set get default desktop dir
+    ,config: defState.config || {}
 }
 
 const mutations = {
@@ -35,6 +36,10 @@ const mutations = {
     }
     ,SetWorkingDir(state, dir){
         state.working_dir = dir
+        LS.set(state)
+    }
+    ,SaveConfig(state, item){
+        state.config = item
         LS.set(state)
     }
 }
@@ -61,6 +66,12 @@ const actions = {
     ,setWorkingDir({commit}, dir){
         return new Promise((resolve, reject)=>{
             commit('SetWorkingDir', dir)
+            resolve()
+        })
+    }
+    ,saveConfig({commit}, item){
+        return new Promise((resolve, reject)=>{
+            commit('SaveConfig', item)
             resolve()
         })
     }

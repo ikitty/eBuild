@@ -2,17 +2,20 @@
 <div class="project_add">
     <div class="mod_tit">全局设置</div>
     <div class="row">
-        <el-checkbox v-model="transRem">开启px2rem</el-checkbox>
-        , 1rem = <el-input class="ipt_ratio" v-model="remPxRatio"></el-input> px
+        <el-checkbox v-model="myConfig.liveReload" >启用LiveReload</el-checkbox>
     </div>
     <div class="row">
-        <el-checkbox v-model="checkSyntax">同步前进行语法检查</el-checkbox>
+        <el-checkbox v-model="myConfig.transRem">开启px2rem</el-checkbox>
+        , 1rem = <el-input class="ipt_ratio" v-model="myConfig.remPxRatio"></el-input> px
     </div>
     <div class="row">
-        <el-checkbox v-model="codeMinify">代码压缩</el-checkbox>
+        <el-checkbox v-model="myConfig.checkSyntax">同步前进行语法检查</el-checkbox>
     </div>
     <div class="row">
-        <el-checkbox v-model="removeProtocolHead">去协议头</el-checkbox>
+        <el-checkbox v-model="myConfig.codeMinify">代码压缩</el-checkbox>
+    </div>
+    <div class="row">
+        <el-checkbox v-model="myConfig.removeProtocolHead">去协议头</el-checkbox>
     </div>
     <div class="row">
         <div class="row_btn">
@@ -23,25 +26,37 @@
 </template>
 
 <script>
-    import {mapMutations } from 'vuex'
-    const store = window.localStorage
+    import {mapGetters, mapActions } from 'vuex'
 
     export default {
         data(){
             return {
-                transRem: true,
-                remPxRatio: 50,
-                checkSyntax: false,
-                codeMinify: false,
-                removeProtocolHead: true
+                myConfig: {
+                    liveReload: false,
+                    transRem: false,
+                    remPxRatio: 50,
+                    checkSyntax: false,
+                    codeMinify: false,
+                    removeProtocolHead: true
+                },
             }
         }
         ,created(){
         }
+        ,mounted() {
+            for (var key in this.config){
+                if (this.config.hasOwnProperty(key)) {
+                    this.myConfig[key] = this.config[key]
+                }
+            }
+        }
+        ,computed:{
+            ...mapGetters(['config'])
+        }
         ,methods: {
-            ...mapMutations(['addCount'])
+            ...mapActions(['saveConfig'])
             ,save() {
-                //TODO
+                this.saveConfig(this.myConfig)
                 this.$router.push({name: 'index'})
             }
         }
@@ -56,7 +71,7 @@
     .project_add .row_btn button {margin-right: 10px;}
     .project_add .sel {width:100%;}
 
-    .ipt_ratio {width: 40px;height: 20px;}
+    .ipt_ratio {width: 70px; height: 20px;text-align: center;}
 
 </style>
 
