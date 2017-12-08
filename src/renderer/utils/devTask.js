@@ -109,7 +109,7 @@ const devTask = (taskPath, cb)=>{
 
         watcher
             .on('change', function (trans) {
-                console.log(trans.path + ' has been changed');
+                // console.log(trans.path + ' has been changed');
                 watchHandler(trans.type, trans.path);
             })
             //todo
