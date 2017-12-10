@@ -29,7 +29,7 @@ const startServer = function (rootPath, cb) {
     cb();
 }
 
-const devTask = (taskPath, cb)=>{
+const devTask = (taskPath, cbStep, cb)=>{
     let paths = {
         src: {
             dir: path.join(taskPath, './src'),
@@ -181,17 +181,21 @@ const devTask = (taskPath, cb)=>{
     async.series([
         function (next) {
             del(paths.dev.dir, {force: true}).then(function () { next(); })
+            cbStep({cont:'Clear dev files', ret:'OK'})
         },
         function (next) {
             async.parallel([
                 function (cb) {
                     copyHandler('img', cb);
+                    cbStep({cont:'Copy img files', ret:'OK'})
                 },
                 function (cb) {
                     copyHandler('js', cb);
+                    cbStep({cont:'Copy js files', ret:'OK'})
                 },
                 function (cb) {
                     compileHtml(cb);
+                    cbStep({cont:'Copy html files', ret:'OK'})
                 }
             ], function (error) {
                 if (error) { throw new Error(error); }

@@ -20,7 +20,9 @@
         <div class="hide_input_wrap">
             <input type="button" id="hideInput" class="" value=""/>
         </div>
-        <el-input type="textarea" class="txts" :rows="textAreaRows" :readonly="textAreaReadonly" resize="none" v-model="consoleInfo"> </el-input>
+        <div class="log_wrap">
+            <p v-for="(item,index) in logs" :key="index">{{item.cont}} {{item.ret}}</p>
+        </div>
     </div>
 </div>
 </template>
@@ -37,7 +39,9 @@
             return {
                 textAreaRows: 16, //arg must be Number type 
                 textAreaReadonly: true,
-                consoleInfo: 'console.log("test")'
+                logs: [
+                    {cont:'操作内容', ret: 'OK' }
+                ]
             }
         }
         ,computed: {
@@ -50,6 +54,9 @@
             ,taskItemClick(item){
                 this.setCurrentTask(item)
             }
+            ,saveLog(v){
+                this.logs.push(v)
+            }
             ,localServe(){
                 if (!this.current_task.name ){
                     this.$alert('choose a task plz :)', '提示');
@@ -58,7 +65,7 @@
 
                 let path = this.current_task.path
                 
-                util.devTask(path)
+                util.devTask(path, this.saveLog)
 
                 // this.$alert('create local server for: ' + this.current_task.name , '提示' );
             }
@@ -90,4 +97,7 @@
 
     .hide_input_wrap {position: relative;height: 0;overflow: hidden;}
     .hide_input_wrap input {position: absolute;top:0;left: 0;}
+
+    .log_wrap {border: 1px solid #ccc;}
+    .log_wrap p {margin: 10px 0 ;}
 </style>
