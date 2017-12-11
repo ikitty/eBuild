@@ -181,21 +181,21 @@ const devTask = (taskPath, cbStep, cb)=>{
     async.series([
         function (next) {
             del(paths.dev.dir, {force: true}).then(function () { next(); })
-            cbStep({cont:'Clear dev files', ret:'OK'})
+            cbStep({cont:'Clear dev files', ret:'ok'})
         },
         function (next) {
             async.parallel([
                 function (cb) {
                     copyHandler('img', cb);
-                    cbStep({cont:'Copy img files', ret:'OK'})
+                    cbStep({cont:'Copy img files', ret:'ok'})
                 },
                 function (cb) {
                     copyHandler('js', cb);
-                    cbStep({cont:'Copy js files', ret:'OK'})
+                    cbStep({cont:'Copy js files', ret:'ok'})
                 },
                 function (cb) {
                     compileHtml(cb);
-                    cbStep({cont:'Copy html files', ret:'OK'})
+                    cbStep({cont:'Copy html files', ret:'ok'})
                 }
             ], function (error) {
                 if (error) { throw new Error(error); }
