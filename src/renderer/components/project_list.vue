@@ -21,7 +21,7 @@
             <input type="button" id="hideInput" class="" value=""/>
         </div>
         <div class="log_wrap">
-            <p v-for="(item,index) in logs" :key="index">{{item.cont}} {{item.ret}}</p>
+            <p v-for="(item,index) in logs" :key="index">{{item.cont}} <span :class="'status_' + item.ret">{{item.ret == 'ok'? '成功': item.ret == 'fail' ? '失败' : ''}}</span></p>
         </div>
     </div>
 </div>
@@ -40,7 +40,8 @@
                 textAreaRows: 16, //arg must be Number type 
                 textAreaReadonly: true,
                 logs: [
-                    {cont:'操作内容', ret: 'OK' }
+                    {cont:'操作内容', ret: 'ok' }
+                    ,{cont:'test', ret: 'fail' }
                 ]
             }
         }
@@ -98,6 +99,8 @@
     .hide_input_wrap {position: relative;height: 0;overflow: hidden;}
     .hide_input_wrap input {position: absolute;top:0;left: 0;}
 
-    .log_wrap {border: 1px solid #ccc;}
+    .log_wrap {border: 1px solid #000;border-radius: 3px;padding: 0 10px;background: #333;color: #ddd;}
     .log_wrap p {margin: 10px 0 ;}
+    .log_wrap .status_ok {color: #3f3}
+    .log_wrap .status_fail {color: #f60}
 </style>
