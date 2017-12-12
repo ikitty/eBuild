@@ -9,9 +9,16 @@ let appHeight = 520
 
 if (process.env.NODE_ENV !== 'development') {
     global.__static = require('path').join(__dirname, '/static').replace(/\\/g, '\\\\')
+
+//dev
 }else{
-    appWidth = 1100    
-    appHeight = 720    
+    appWidth = 1400    
+    appHeight = 1100    
+
+    if (process.platform == 'darwin') {
+        appWidth = 1100    
+        appHeight = 720    
+    }
 }
 
 

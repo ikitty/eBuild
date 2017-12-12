@@ -24,6 +24,17 @@ const startServer = function (rootPath, cb) {
     cb();
 }
 
+const getRelativePath = (path)=>{
+    // winPath is : c:\\desktop\\xxx\\yyy , 
+    // macPath is: /xx/yy/zz, all to:  \project\src\...
+    let reg = /\\\w+\\src\\.*/g  
+    if (process.platform == 'darwin') {
+        reg = /\/\w+\/src\/.*/g
+    }
+    let ret = path.match(reg)
+    return ret && ret[0] || ''
+}
+
 const devTask = (taskPath, sendLog, cb)=>{
     let paths = {
         src: {
@@ -48,10 +59,7 @@ const devTask = (taskPath, sendLog, cb)=>{
             file = paths['src'][type]
             modify = type + '文件' 
         }else{
-            let reg = /\\\w+\\src\\.*/g  
-            let path = file.match(reg)
-            path = path && path [0] || ''
-            modify = path
+            modify = getRelativePath(file)
         }
 
         gulp.src(file, {base: paths.src.dir})
@@ -89,13 +97,8 @@ const devTask = (taskPath, sendLog, cb)=>{
         gulpWatch([paths.src.dir], function(arg){
             let e = arg.event
             let orgPath = arg.history[0]
-            //todo handle mac path, fu<k windows path
-            // orgPath is : c:\\desktop\\xxx\\yyy ,  to \project\src\...
-            let reg = /\\\w+\\src\\.*/g  
-            console.log('Gwatch', e, orgPath);
 
-            let path = orgPath.match(reg)
-            path = path && path [0] || ''
+            let path = getRelativePath(orgPath)
             let action = e=='add'? '添加': e=='change' ? '修改': '删除'
 
             sendLog({cont: action + '文件: ' + path})
