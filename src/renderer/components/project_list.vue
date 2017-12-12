@@ -68,17 +68,16 @@
                     this.$alert('choose a task plz :)', '提示');
                     return
                 }
-
                 let path = this.current_task.path
-                
                 util.devTask(path, this.saveLog)
-
-                // this.$alert('create local server for: ' + this.current_task.name , '提示' );
             }
             ,removeTask(){
-                this.delTask(this.current_task)
-                this.$alert('成功删除: ' + this.current_task.name , '提示' );
-                //todo remove src
+                util.deleteTask(this.current_task.path, ()=>{
+                    this.saveLog({ cont: '删除项目' + this.current_task.name, ret: 'ok' })
+                    this.delTask(this.current_task)
+                    this.setCurrentTask({})
+                })
+                // this.$alert('成功删除: ' + this.current_task.name , '提示' );
             }
             ,removeFocusState(e){
                 //remove btn focus status to disable focus style  (bad design in element-ui)

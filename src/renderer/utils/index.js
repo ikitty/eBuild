@@ -2,6 +2,7 @@
 
 import gulp from 'gulp'
 import path from 'path'
+import del from 'del'
 import {devTask} from './devTask'
 
 const tempPath = path.join(__dirname, '../template/event/**/*')
@@ -13,8 +14,15 @@ const createTask = (targetPath)=> {
         })
 }
 
+//Del task path
+const deleteTask = (path, cb)=> {
+    del([path], { force: true }).then(function () {
+        cb && cb()
+    });
+}
 
 export default {
     createTask,
+    deleteTask,
     devTask
 }
