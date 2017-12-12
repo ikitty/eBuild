@@ -8,12 +8,7 @@ import gulpWatch from 'gulp-watch'
 
 const BS = browserSync.create();
 const startServer = function (rootPath, cb) {
-    console.log('Starting Local Server');
     BS.init({
-        // server: {
-        //     baseDir: paths.dev.dir,
-        //     directory: true
-        // },
         server: rootPath,
         startPath: "/html/",
         port: 8098,
@@ -29,7 +24,7 @@ const startServer = function (rootPath, cb) {
     cb();
 }
 
-const devTask = (taskPath, cbStep, cb)=>{
+const devTask = (taskPath, sendLog, cb)=>{
     let paths = {
         src: {
             dir: path.join(taskPath, './src'),
@@ -47,86 +42,69 @@ const devTask = (taskPath, cbStep, cb)=>{
         }
     };
 
-    function copyHandler(type, file, cb) {
-        if (typeof file === 'function') {
-            cb = file;
-            file = paths['src'][type];
+    function doCopy(type, file, cb) {
+        var modify 
+        if (file == 'all') {
+            file = paths['src'][type]
+            modify = type + '文件' 
+        }else{
+            let reg = /\\\w+\\src\\.*/g  
+            let path = file.match(reg)
+            path = path && path [0] || ''
+            modify = path
         }
 
         gulp.src(file, {base: paths.src.dir})
-        // gulp.src(file)
             .pipe(gulp.dest(paths.dev.dir))
             .on('end', function () {
-                console.log(`Copy ${type} success.`);
-                // log(`copy ${type} success.`);
-                // cb ? cb() : reloadHandler();
-                if (cb) {
-                    cb()
-                }else{
-                    // BS.reload()
-                }
+                sendLog({cont: '更新' + modify , ret:'ok'})
+                cb && cb()
+                BS.reload()
             });
-    }
-
-    function compileLess(cb) {
-        gulp.src(paths.src.less, {base: paths.src.dir})
-            .pipe(less({relativeUrls: true}))
-            .on('error', function (error) {
-                console.log(error.message);
-            })
-            .pipe(gulp.dest(paths.dev.dir))
-            .on('end', function () {
-                if (cb) {
-                    console.log('compile Less success.');
-                    log('compile Less success.');
-                    cb();
-                } else {
-                    reloadHandler();
-                }
-            })
     }
 
     function compileHtml(cb) {
         gulp.src(paths.src.html, {base: paths.src.dir})
+            //TODO add str replace
             .pipe(gulp.dest(paths.dev.dir))
             .on('end', function () {
-                console.log('Compile Html OK.');
+                sendLog({cont:'编译HTML', ret: 'ok'})
                 cb && cb();
                 BS.reload()
             })
     }
 
-    //监听文件
-    function watch(cb) {
-        gulpWatch([paths.src.html], function(arg){
-            console.log('gwatch file change', arg.event, arg.history[0]);
-        })
-        var watcher = gulp.watch([
-                paths.src.html, paths.src.js, paths.src.img
-            ],
-            {ignored: /[\/\\]\./}
-        );
+    //TODO
+    function compileCSS(cb){
 
-        watcher
-            .on('change', function (trans) {
-                // console.log(trans.path + ' has been changed');
-                watchHandler(trans.type, trans.path);
-            })
-            //todo
-            .on('add', function (file) {
-                console.log(file + ' has been added');
-                watchHandler('add', file);
-            })
-            .on('unlink', function (file) {
-                console.log(file + ' is deleted');
-                watchHandler('removed', file);
-            });
+    }
+    //TODO
+    function compileJS(cb){
 
-        console.log('watching...');
-        cb();
     }
 
-    function watchHandler(type, file) {
+    //监听文件
+    function watch(cb) {
+        //todo add ignore
+        gulpWatch([paths.src.dir], function(arg){
+            let e = arg.event
+            let orgPath = arg.history[0]
+            //todo handle mac path, fu<k windows path
+            // orgPath is : c:\\desktop\\xxx\\yyy ,  to \project\src\...
+            let reg = /\\\w+\\src\\.*/g  
+            console.log('Gwatch', e, orgPath);
+
+            let path = orgPath.match(reg)
+            path = path && path [0] || ''
+            let action = e=='add'? '添加': e=='change' ? '修改': '删除'
+
+            sendLog({cont: action + '文件: ' + path})
+            handleWatch(e, orgPath)
+        })
+        cb && cb();
+    }
+
+    function handleWatch(type, file) {
         let target = file.split('src')[1].match(/[\/\\](\w+)[\/\\]/);
         if (target.length && target[1]) {
             target = target[1];
@@ -134,43 +112,52 @@ const devTask = (taskPath, cbStep, cb)=>{
 
         switch (target) {
             case 'img':
-                if (type === 'removed') {
+                if (type === 'unlink') {
                     let tmp = file.replace(/src/, 'dev');
                     del([tmp], {force: true}).then(function () {
-                        reloadHandler();
+                        sendLog({cont: '删除对应IMG文件', ret: 'ok'})
                     });
                 } else {
-                    copyHandler('img', file);
+                    doCopy('img', file);
                 }
                 break;
 
             case 'js':
-                if (type === 'removed') {
+                if (type === 'unlink') {
                     var tmp = file.replace(/src/, 'dev');
-                    del([tmp], {force: true});
+                    del([tmp], {force: true}).then(function () {
+                        sendLog({cont: '删除对应JS文件', ret: 'ok'})
+                    });
                 } else {
-                    copyHandler('js', file);
+                    //TODO isMinify
+                    doCopy('js', file);
                 }
                 break;
             case 'css':
                 var ext = path.extname(file);
 
-                if (type === 'removed') {
+                if (type === 'unlink') {
                     var tmp = file.replace(/src/, 'dev').replace('.less', '.css');
-                    del([tmp], {force: true});
+                    del([tmp], {force: true}).then(function () {
+                        sendLog({cont: '删除对应CSS文件', ret: 'ok'})
+                    });
                 } else {
-                    if (ext === '.less') {
-                        compileLess();
-                    } else {
-                        // compileSass();
-                    }
+                    //TODO compile css , px2rem, pathReplace
+                    doCopy('css', file);
+                    // if (ext === '.less') {
+                    //     compileLess();
+                    // } else {
+                    //     doCopy('css', file);
+                    // }
                 }
                 break;
 
             case 'html':
-                if (type === 'removed') {
+                if (type === 'unlink') {
                     let tmp = file.replace(/src/, 'dev');
-                    del([tmp], {force: true}).then(function () { });
+                    del([tmp], {force: true}).then(function () {
+                        sendLog({cont: '删除对应HTML文件', ret: 'ok'})
+                    });
                 } else {
                     compileHtml();
                 }
@@ -178,24 +165,32 @@ const devTask = (taskPath, cbStep, cb)=>{
         }
     };
 
+    //init
     async.series([
         function (next) {
-            del(paths.dev.dir, {force: true}).then(function () { next(); })
-            cbStep({cont:'Clear dev files', ret:'ok'})
+            sendLog({cont:'开始清除dev目录文件'})
+            del(paths.dev.dir, {force: true}).then(function () {
+                sendLog({cont:'清除dev目录文件', ret:'ok'})
+                next();
+            })
         },
         function (next) {
             async.parallel([
                 function (cb) {
-                    copyHandler('img', cb);
-                    cbStep({cont:'Copy img files', ret:'ok'})
+                    sendLog({cont:'开始处理IMG文件'})
+                    doCopy('img', 'all',  cb);
                 },
                 function (cb) {
-                    copyHandler('js', cb);
-                    cbStep({cont:'Copy js files', ret:'ok'})
+                    sendLog({cont:'开始处理CSS文件'})
+                    doCopy('css', 'all', cb);
                 },
                 function (cb) {
+                    sendLog({cont:'开始处理JS文件'})
+                    doCopy('js', 'all',  cb);
+                },
+                function (cb) {
+                    sendLog({cont:'开始编译HTML'})
                     compileHtml(cb);
-                    cbStep({cont:'Copy html files', ret:'ok'})
                 }
             ], function (error) {
                 if (error) { throw new Error(error); }
@@ -203,20 +198,18 @@ const devTask = (taskPath, cbStep, cb)=>{
             })
         },
         function (next) {
+            sendLog({cont:'开始监听src目录中的文件'})
             watch(next);
         },
         function (next) {
+            sendLog({cont:'开始启动本地服务器'})
             startServer(paths.dev.dir, next);
         }
     ], function (error) {
-        if (error) {
-            throw new Error(error);
-        }
+        if (error) { throw new Error(error); }
     });
 
     cb && cb()
 }
 
-//如果是这样单个导出（没有default keyword） 那么import时 需要使用{}
-//如果是export default {},那么import时是不能使用{}单独导入某个接口的
 export { devTask }
