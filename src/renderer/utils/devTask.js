@@ -10,7 +10,8 @@ const BS = browserSync.create();
 const startServer = function (rootPath, cb) {
     BS.init({
         server: rootPath,
-        startPath: "/html/",
+        startPath: "/",
+        // startPath: "/html/",
         port: 8098,
         reloadDelay: 0,
         timestamps: true,
@@ -39,14 +40,16 @@ const devTask = (taskPath, sendLog, cb)=>{
     let paths = {
         src: {
             dir: path.join(taskPath, './src'),
-            html: path.join(taskPath, './src/html/**/*'),
+            html: path.join(taskPath, './src/*.{html,htm,shtml}'), //glob pattern
+            // html: path.join(taskPath, './src/html/**/*'),
             css: path.join(taskPath, './src/css/**/*'),
             js: path.join(taskPath, './src/js/**/*'),
             img: path.join(taskPath, './src/img/**/*')
         },
         dev: {
             dir: path.join(taskPath, './dev'),
-            html: path.join(taskPath, './dev/html'),
+            html: path.join(taskPath, './dev/'),
+            // html: path.join(taskPath, './dev/html'),
             css: path.join(taskPath, './dev/css'),
             js: path.join(taskPath, './dev/js'),
             img: path.join(taskPath, './dev/img')
@@ -93,8 +96,7 @@ const devTask = (taskPath, sendLog, cb)=>{
 
     //监听文件
     function watch(cb) {
-        //todo add ignore
-        gulpWatch([paths.src.dir], function(arg){
+        gulpWatch([paths.src.dir], {ignored: /[\/\\]\./}, function(arg){
             let e = arg.event
             let orgPath = arg.history[0]
 
@@ -109,9 +111,7 @@ const devTask = (taskPath, sendLog, cb)=>{
 
     function handleWatch(type, file) {
         let target = file.split('src')[1].match(/[\/\\](\w+)[\/\\]/);
-        if (target.length && target[1]) {
-            target = target[1];
-        }
+        target = target && target[1] ? target[1] : 'html'
 
         switch (target) {
             case 'img':
