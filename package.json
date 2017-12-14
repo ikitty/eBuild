@@ -57,6 +57,7 @@
     "del": "^3.0.0",
     "element-ui": "^2.0.7",
     "gulp": "^3.9.1",
+    "gulp-convert-encoding": "1.0.0",
     "gulp-replace": "0.6.1",
     "gulp-watch": "^4.3.11",
     "vue": "^2.4.4",

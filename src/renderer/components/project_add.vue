@@ -68,7 +68,7 @@
 
         }
         ,computed: {
-            ...mapGetters(['working_dir'])
+            ...mapGetters(['working_dir', 'task_list'])
         }
         ,methods: {
             ...mapActions(['addTask' , 'setWorkingDir'])
@@ -78,7 +78,14 @@
                     return
                 }
 
+                let inTaskList = (value,key)=>{ return value.name == this.taskName }
+                if (this.task_list.some(inTaskList)){
+                    this.$alert('已有同名任务', '提示' );
+                    return
+                }
+
                 let path = this.working_dir + '/' + this.taskName + '/'
+                //todo deDuplicate
                 util.createTask(path)
                 this.addTask({name: this.taskName, path: path, domain: this.taskDomain});
 

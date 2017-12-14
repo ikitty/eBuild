@@ -6,6 +6,7 @@ import async from 'async'
 import browserSync from 'browser-sync'
 import gulpWatch from 'gulp-watch'
 import gulpReplace from 'gulp-replace'
+import gulpEncode from 'gulp-convert-encoding'
 
 let imgPrefix = '//game.gtimg.cn/images/'
 
@@ -80,8 +81,13 @@ const devTask = (task, sendLog, cb)=>{
 
     function compileHtml(cb) {
         gulp.src(paths.src.html, {base: paths.src.dir})
-            //TODO opt str replace
+            //todo charset check
+            .pipe(gulpEncode({ from: 'gbk', to: 'utf-8'}))
+            .pipe(gulpReplace('charset="gbk"', 'charset="utf-8"')) 
+            .pipe(gulpReplace('src="images/', 'src="' + imgPrefix ))
             .pipe(gulpReplace('http://', '//' ))
+
+            // .pipe(gulpEncode({ to: 'gbk'}))  dev just use utf-8
             .pipe(gulp.dest(paths.dev.dir))
             .on('end', function () {
                 sendLog({cont:'编译HTML', ret: 'ok'})
@@ -93,7 +99,8 @@ const devTask = (task, sendLog, cb)=>{
     //TODO add px2rem
     function compileCSS(cb){
         gulp.src(paths.src.css, {base: paths.src.dir})
-            .pipe(gulpReplace('../images/', imgPrefix ))
+            // todo for build
+            // .pipe(gulpReplace('../images/', imgPrefix ))
             .pipe(gulp.dest(paths.dev.dir))
             .on('end', function () {
                 sendLog({cont:'编译CSS', ret: 'ok'})
@@ -221,7 +228,10 @@ const devTask = (task, sendLog, cb)=>{
         },
         function (next) {
             sendLog({cont:'开始启动本地服务器'})
-            startServer(paths.dev.dir, next);
+            startServer(paths.dev.dir, function(){
+                sendLog({cont:'启动本地服务器', ret: 'ok'})
+                next()
+            });
         }
     ], function (error) {
         if (error) { throw new Error(error); }
