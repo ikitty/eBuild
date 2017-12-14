@@ -11,6 +11,14 @@
             </div>
         </div>
         <div class="row">
+            <p class="row_hd">项目域名 </p>
+            <div class="row_bd">
+                <el-input v-model="taskDomain" type="url">
+                    <template slot="append">.qq.com</template>
+                </el-input>
+            </div>
+        </div>
+        <div class="row">
             <p class="row_hd">活动名称 (如: a20171013wuxia)</p>
             <div class="row_bd">
                 <el-input v-model="taskName"></el-input>
@@ -44,9 +52,10 @@
     export default {
         data(){
             return {
+                taskDomain: 'pvp',
                 taskName: '',
-                taskPath: '',
-                taskTemplate: 'templateDefault',
+                taskTemplate: 'templateDefault', //todo
+
                 templates: [
                     {value:'templateDefault',label:'默认活动模板'},
                     // {value:'templateXycq',label:'轩辕传奇手游活动模板'}
@@ -55,19 +64,23 @@
         }
         ,created(){
         }
+        ,mounted(){
+
+        }
         ,computed: {
             ...mapGetters(['working_dir'])
         }
         ,methods: {
             ...mapActions(['addTask' , 'setWorkingDir'])
             ,createProj() {
-                if (!this.taskName ){
-                    this.$alert('请输入字段内容', '提示' );
+                if (!this.taskName || !this.taskDomain || !this.working_dir){
+                    this.$alert('所有字段内容不能为空', '提示' );
                     return
                 }
+
                 let path = this.working_dir + '/' + this.taskName + '/'
                 util.createTask(path)
-                this.addTask({name: this.taskName, path: path});
+                this.addTask({name: this.taskName, path: path, domain: this.taskDomain});
 
                 this.$router.push({name: 'projectList'})
             }
@@ -93,6 +106,7 @@
     
     .project_add .row_btn { padding: 15px 0 0; } 
     .project_add .row_btn button { margin-right: 10px; }
+
     
     .project_add .sel { width: 100%; }
 

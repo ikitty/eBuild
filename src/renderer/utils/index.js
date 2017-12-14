@@ -16,9 +16,7 @@ const createTask = (targetPath)=> {
 
 //Del task path
 const deleteTask = (path, cb)=> {
-    del([path], { force: true }).then(function () {
-        cb && cb()
-    });
+    return del([path], { force: true })
 }
 
 export default {

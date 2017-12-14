@@ -5,6 +5,9 @@ import del from 'del'
 import async from 'async'
 import browserSync from 'browser-sync'
 import gulpWatch from 'gulp-watch'
+import gulpReplace from 'gulp-replace'
+
+let imgPrefix = '//game.gtimg.cn/images/'
 
 const BS = browserSync.create();
 const startServer = function (rootPath, cb) {
@@ -28,31 +31,32 @@ const startServer = function (rootPath, cb) {
 const getRelativePath = (path)=>{
     // winPath is : c:\\desktop\\xxx\\yyy , 
     // macPath is: /xx/yy/zz, all to:  \project\src\...
-    let reg = /\\\w+\\src\\.*/g  
-    if (process.platform == 'darwin') {
-        reg = /\/\w+\/src\/.*/g
-    }
+    let reg = /[\\\/]\w+[\\\/]src[\\\/].*/g  
+    // if (process.platform == 'darwin') {
+    //     reg = /\/\w+\/src\/.*/g
+    // }
     let ret = path.match(reg)
     return ret && ret[0] || ''
 }
 
-const devTask = (taskPath, sendLog, cb)=>{
+const devTask = (task, sendLog, cb)=>{
+    let taskPath = task.path
+    imgPrefix = '//game.gtimg.cn/images/' + task.domain + '/act/' + task.name + '/'
+
     let paths = {
         src: {
             dir: path.join(taskPath, './src'),
             html: path.join(taskPath, './src/*.{html,htm,shtml}'), //glob pattern
-            // html: path.join(taskPath, './src/html/**/*'),
             css: path.join(taskPath, './src/css/**/*'),
             js: path.join(taskPath, './src/js/**/*'),
-            img: path.join(taskPath, './src/img/**/*')
+            img: path.join(taskPath, './src/images/**/*')
         },
         dev: {
             dir: path.join(taskPath, './dev'),
             html: path.join(taskPath, './dev/'),
-            // html: path.join(taskPath, './dev/html'),
             css: path.join(taskPath, './dev/css'),
             js: path.join(taskPath, './dev/js'),
-            img: path.join(taskPath, './dev/img')
+            img: path.join(taskPath, './dev/images')
         }
     };
 
@@ -76,7 +80,8 @@ const devTask = (taskPath, sendLog, cb)=>{
 
     function compileHtml(cb) {
         gulp.src(paths.src.html, {base: paths.src.dir})
-            //TODO add str replace
+            //TODO opt str replace
+            .pipe(gulpReplace('http://', '//' ))
             .pipe(gulp.dest(paths.dev.dir))
             .on('end', function () {
                 sendLog({cont:'编译HTML', ret: 'ok'})
@@ -85,8 +90,16 @@ const devTask = (taskPath, sendLog, cb)=>{
             })
     }
 
-    //TODO
+    //TODO add px2rem
     function compileCSS(cb){
+        gulp.src(paths.src.css, {base: paths.src.dir})
+            .pipe(gulpReplace('../images/', imgPrefix ))
+            .pipe(gulp.dest(paths.dev.dir))
+            .on('end', function () {
+                sendLog({cont:'编译CSS', ret: 'ok'})
+                cb && cb();
+                BS.reload()
+            })
 
     }
     //TODO
@@ -114,7 +127,7 @@ const devTask = (taskPath, sendLog, cb)=>{
         target = target && target[1] ? target[1] : 'html'
 
         switch (target) {
-            case 'img':
+            case 'images':
                 if (type === 'unlink') {
                     let tmp = file.replace(/src/, 'dev');
                     del([tmp], {force: true}).then(function () {
@@ -145,8 +158,9 @@ const devTask = (taskPath, sendLog, cb)=>{
                         sendLog({cont: '删除对应CSS文件', ret: 'ok'})
                     });
                 } else {
+                    compileCSS()
                     //TODO compile css , px2rem, pathReplace
-                    doCopy('css', file);
+                    // doCopy('css', file);
                     // if (ext === '.less') {
                     //     compileLess();
                     // } else {
@@ -185,7 +199,8 @@ const devTask = (taskPath, sendLog, cb)=>{
                 },
                 function (cb) {
                     sendLog({cont:'开始处理CSS文件'})
-                    doCopy('css', 'all', cb);
+                    // doCopy('css', 'all', cb);
+                    compileCSS(cb)
                 },
                 function (cb) {
                     sendLog({cont:'开始处理JS文件'})

@@ -21,7 +21,13 @@
             <input type="button" id="hideInput" class="" value=""/>
         </div>
         <div class="log_wrap" ref="logWrap">
-            <p v-for="(item,index) in logs" :key="index">{{item.cont}} <span :class="'status_' + item.ret">{{item.ret == 'ok'? '成功': item.ret == 'fail' ? '失败' : ''}}</span></p>
+            <p v-for="(item,index) in logs" :key="index">
+                {{item.cont}}
+                <i v-if="item.ret=='ok'" class="el-icon-success i_ok"></i>
+                <i v-if="item.ret=='fail'" class="el-icon-error i_error"></i>
+                <i v-if="item.ret=='info'" class="el-icon-info i_info"></i>
+                <!-- <i v-if="item.ret=='loading'" class="el-icon-loading i_info"></i> -->
+            </p>
         </div>
     </div>
 </div>
@@ -42,6 +48,8 @@
                 textAreaReadonly: true,
                 logs: [
                     {cont:'操作内容', ret: 'ok' }
+                    ,{cont:'操作内容', ret: 'fail' }
+                    ,{cont:'操作内容', ret: 'info' }
                 ]
             }
         }
@@ -68,16 +76,19 @@
                     this.$alert('choose a task plz :)', '提示');
                     return
                 }
-                let path = this.current_task.path
-                util.devTask(path, this.saveLog)
+                // let path = this.current_task.path
+                util.devTask(this.current_task, this.saveLog)
             }
             ,removeTask(){
-                util.deleteTask(this.current_task.path, ()=>{
+                this.saveLog({ cont: '开始删除项目' + this.current_task.name })
+
+                util.deleteTask(this.current_task.path).then(()=>{
                     this.saveLog({ cont: '删除项目' + this.current_task.name, ret: 'ok' })
                     this.delTask(this.current_task)
                     this.setCurrentTask({})
+                }).catch(err=>{
+                    this.saveLog({cont: '删除项目失败：' + err.message, ret: 'fail'})
                 })
-                // this.$alert('成功删除: ' + this.current_task.name , '提示' );
             }
             ,removeFocusState(e){
                 //remove btn focus status to disable focus style  (bad design in element-ui)
@@ -105,6 +116,7 @@
 
     .log_wrap {height: 360px;overflow-y: auto; border: 1px solid #000;border-radius: 3px;padding: 0 10px;background: #333;color: #ddd;word-break: break-all;}
     .log_wrap p {margin: 10px 0 ;}
-    .log_wrap .status_ok {color: #3f3}
-    .log_wrap .status_fail {color: #f60}
+    .log_wrap .i_ok {color: #67C23A;}
+    .log_wrap .i_error {color: #F56C6C;}
+    .log_wrap .i_info {color: #E6A23C;}
 </style>

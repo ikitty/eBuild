@@ -12,8 +12,8 @@ if (process.env.NODE_ENV !== 'development') {
 
 //dev
 }else{
-    appWidth = 1400    
-    appHeight = 1100    
+    appWidth = 1600    
+    appHeight = 1000    
 
     if (process.platform == 'darwin') {
         appWidth = 1100    
