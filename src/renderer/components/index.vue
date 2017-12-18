@@ -34,22 +34,7 @@ export default {
             }
             let D = {name: files[0].name, path: files[0].path} 
 
-            let srcPath = path.join(D.path, './src')
-            if (!fs.existsSync(srcPath)) {
-                fs.mkdirSync(srcPath)
-                let srcFiles = [path.join(D.path, './**/*'), path.join(`!${D.path}`, './src/**/*')]
-
-                gulp.src(srcFiles)
-                    .pipe(gulp.dest(srcPath))
-                    .on('end', function () {
-                        console.log('copy file ', 1);
-                        // del(srcFiles, {force: true}).then(function () {
-                        //     console.log('rm file', 1);
-                        // });
-                    });
-            }
-            return
-
+            //check taskExist
             let inTaskList = (value,key)=>{
                 return value.name == D.name 
             }
@@ -58,9 +43,31 @@ export default {
                 return
             }
 
-            this.addTask(D)
-            this.$router.push({name: 'projectList'})
+            //check has srcDir
+            let srcPath = path.join(D.path, './src')
+            if (!fs.existsSync(srcPath)) {
+                fs.mkdirSync(srcPath)
+                let srcFiles = [
+                    path.join(D.path, './**/*'),
+                    path.join(`!${D.path}`, './src'),
+                    path.join(`!${D.path}`, './src/**/*')
+                ]
 
+                gulp.src(srcFiles)
+                    .pipe(gulp.dest(srcPath))
+                    .on('end', ()=>{
+                        console.log('copy file ', 1);
+                        del(srcFiles, {force: true}).then(function () {
+                            console.log('rm file', 1);
+                        });
+                        this.addTask(D)
+                        this.$router.push({name: 'projectList'})
+                    });
+
+            }else {
+                this.addTask(D)
+                this.$router.push({name: 'projectList'})
+            }
         }
     }
 }
