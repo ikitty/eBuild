@@ -12,6 +12,10 @@
 
 <script>
 import {mapGetters, mapActions} from 'vuex'
+import path from 'path'
+import fs from 'fs'
+import gulp from 'gulp'
+import del from 'del'
 
 export default {
     created(){
@@ -29,6 +33,22 @@ export default {
                 return
             }
             let D = {name: files[0].name, path: files[0].path} 
+
+            let srcPath = path.join(D.path, './src')
+            if (!fs.existsSync(srcPath)) {
+                fs.mkdirSync(srcPath)
+                let srcFiles = [path.join(D.path, './**/*'), path.join(`!${D.path}`, './src/**/*')]
+
+                gulp.src(srcFiles)
+                    .pipe(gulp.dest(srcPath))
+                    .on('end', function () {
+                        console.log('copy file ', 1);
+                        // del(srcFiles, {force: true}).then(function () {
+                        //     console.log('rm file', 1);
+                        // });
+                    });
+            }
+            return
 
             let inTaskList = (value,key)=>{
                 return value.name == D.name 
