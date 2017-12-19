@@ -30,12 +30,8 @@ const startServer = function (rootPath, cb) {
 }
 
 const getRelativePath = (path)=>{
-    // winPath is : c:\\desktop\\xxx\\yyy , 
-    // macPath is: /xx/yy/zz, all to:  \project\src\...
+    // winPath is : c:\\desktop\\xxx\\yyy , BUT macPath is: /xx/yy/zz
     let reg = /[\\\/]\w+[\\\/]src[\\\/].*/g  
-    // if (process.platform == 'darwin') {
-    //     reg = /\/\w+\/src\/.*/g
-    // }
     let ret = path.match(reg)
     return ret && ret[0] || ''
 }
@@ -240,4 +236,116 @@ const devTask = (task, sendLog, cb)=>{
     cb && cb()
 }
 
-export { devTask }
+const buildTask = (task, sendLog, cb)=>{
+    let taskPath = task.path
+    imgPrefix = '//game.gtimg.cn/images/' + task.domain + '/act/' + task.name + '/'
+
+    let paths = {
+        src: {
+            dir: path.join(taskPath, './src'),
+            html: path.join(taskPath, './src/*.{html,htm,shtml}'), //glob pattern
+            css: path.join(taskPath, './src/css/**/*'),
+            js: path.join(taskPath, './src/js/**/*'),
+            img: path.join(taskPath, './src/images/**/*')
+        },
+        build: {
+            dir: path.join(taskPath, './build'),
+            html: path.join(taskPath, './build/'),
+            css: path.join(taskPath, './build/css'),
+            js: path.join(taskPath, './build/js'),
+            img: path.join(taskPath, './build/images')
+        }
+    };
+
+    function doCopy(type, file, cb) {
+        var modify 
+        if (file == 'all') {
+            file = paths['src'][type]
+            modify = type + '文件' 
+        }else{
+            modify = getRelativePath(file)
+        }
+
+        gulp.src(file, {base: paths.src.dir})
+            .pipe(gulp.dest(paths.build.dir))
+            .on('end', function () {
+                sendLog({cont: '更新' + modify , ret:'ok'})
+                cb && cb()
+                BS.reload()
+            });
+    }
+
+    function compileHtml(cb) {
+        gulp.src(paths.src.html, {base: paths.src.dir})
+            //todo charset check
+            .pipe(gulpEncode({ from: 'gbk', to: 'utf-8'}))
+            // .pipe(gulpReplace('charset="gbk"', 'charset="utf-8"')) 
+            .pipe(gulpReplace('src="images/', 'src="' + imgPrefix ))
+            .pipe(gulpReplace('http://', '//' ))
+
+            .pipe(gulpEncode({ to: 'gbk'}))  
+            .pipe(gulp.dest(paths.build.dir))
+            .on('end', function () {
+                sendLog({cont:'编译HTML', ret: 'ok'})
+                cb && cb();
+                BS.reload()
+            })
+    }
+
+    //TODO add px2rem
+    function compileCSS(cb){
+        gulp.src(paths.src.css, {base: paths.src.dir})
+            .pipe(gulpReplace('../images/', imgPrefix ))
+            .pipe(gulp.dest(paths.build.dir))
+            .on('end', function () {
+                sendLog({cont:'编译CSS', ret: 'ok'})
+                cb && cb();
+                BS.reload()
+            })
+
+    }
+    //TODO
+    function compileJS(cb){
+
+    }
+
+    //init
+    async.series([
+        function (next) {
+            sendLog({cont:'开始清除build目录文件'})
+            del(paths.build.dir, {force: true}).then(function () {
+                sendLog({cont:'清除build目录文件', ret:'ok'})
+                next();
+            })
+        },
+        function (next) {
+            async.parallel([
+                function (cb) {
+                    sendLog({cont:'开始处理IMG文件'})
+                    doCopy('img', 'all',  cb);
+                },
+                function (cb) {
+                    sendLog({cont:'开始处理CSS文件'})
+                    compileCSS(cb)
+                },
+                function (cb) {
+                    sendLog({cont:'开始处理JS文件'})
+                    doCopy('js', 'all',  cb);
+                },
+                function (cb) {
+                    sendLog({cont:'开始编译HTML'})
+                    compileHtml(cb);
+                }
+            ], function (error) {
+                if (error) { throw new Error(error); }
+                next();
+            })
+        }
+    ], function (error) {
+        if (error) { throw new Error(error); }
+    });
+
+    cb && cb()
+}
+
+export { devTask ,buildTask }

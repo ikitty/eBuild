@@ -1,4 +1,6 @@
 // import { resolve } from "url";
+import os from 'os'
+import path from 'path'
 
 const STORAGE_KEY = 'eBuild'
 const Store = window.localStorage
@@ -16,7 +18,7 @@ let defState = LS.get()
 const state = {
     task_list: defState.task_list || []
     ,current_task: defState.current_task || {}
-    ,working_dir: defState.working_dir || '' //todo set get default desktop dir
+    ,working_dir: defState.working_dir || path.join(os.homedir(), './Desktop/')
     ,config: defState.config || {}
 }
 
@@ -25,8 +27,17 @@ const mutations = {
         state.task_list.push(task)
         LS.set(state)
     }
+    ,UpdateTask(state, task){
+        state.task_list = state.task_list.map(item => {
+            if (item.name == task.name) {
+                return task
+            }else{
+                return item
+            }
+        })
+        LS.set(state)
+    }
     ,DelTask (state, task){ 
-        //todo delete by name and path
         state.task_list = state.task_list.filter(item=>item.name != task.name)
         LS.set(state)
     }
@@ -48,6 +59,12 @@ const actions = {
     addTask({commit}, task){
         return new Promise((resolve, reject)=>{
             commit('AddTask', task)
+            resolve()
+        })
+    }
+    ,updateTask({commit}, task){
+        return new Promise((resolve, reject)=>{
+            commit('UpdateTask', task)
             resolve()
         })
     }

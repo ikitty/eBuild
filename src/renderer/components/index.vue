@@ -77,6 +77,6 @@ export default {
 .index {text-align: center;padding-top: 200px;}
 .index .btn {margin: 0 10px;}
 
-.btn_apply {position: relative; display: inline-block;width: 100px;height: 35px;background: #39f;text-align: center;line-height: 35px;border-radius: 3px;color: #fff;cursor: pointer;}
+.btn_apply {position: relative; display: inline-block;width: 100px;height: 40px;background: #39f;text-align: center;line-height: 40px;border-radius: 3px;color: #fff;cursor: pointer;font-family: simsun;}
 .btn_apply input {position: absolute;top:0;left: 0;width: 100%;height: 100%;opacity: 0;overflow: hidden;cursor: pointer;}
 </style>

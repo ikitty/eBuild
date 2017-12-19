@@ -11,11 +11,11 @@
 
     <div class="main">
         <div class="btns" @click="removeFocusState">
-            <el-button type="" @click="localServe" icon="menu">预览</el-button>
-            <el-button type="" icon="check">检测</el-button>
-            <el-button type="" icon="upload2">同步</el-button>
-            <el-button type="" icon="setting">设置</el-button>
-            <el-button type="danger" @click="removeTask" icon="delete2">删除</el-button>
+            <el-button type="" icon="menu" @click="localServe">本地预览</el-button>
+            <el-button type="" icon="check">规范检测</el-button>
+            <el-button type="" icon="upload2" @click="buildTask">编译</el-button>
+            <el-button type="" icon="setting" @click="layerSetShow=true">设置</el-button>
+            <el-button type="danger" icon="delete2" @click="removeTask">删除</el-button>
         </div>
         <div class="hide_input_wrap">
             <input type="button" id="hideInput" class="" value=""/>
@@ -29,6 +29,25 @@
                 <!-- <i v-if="item.ret=='loading'" class="el-icon-loading i_info"></i> -->
             </p>
         </div>
+        <el-dialog title="编辑该项目配置" :visible.sync="layerSetShow" width="50%" >
+
+            <div class="project_add">
+                <div class="row">
+                    <p class="row_hd">项目域名 </p>
+                    <div class="row_bd">
+                        <el-input v-model="taskDomain" type="url">
+                            <template slot="append">.qq.com</template>
+                        </el-input>
+                    </div>
+                </div>
+            </div>
+
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="layerSetShow = false">取 消</el-button>
+                <el-button type="primary" @click="updateInfo">确 定</el-button>
+            </span>
+        </el-dialog>
+
     </div>
 </div>
 </template>
@@ -44,6 +63,9 @@
     export default {
         data(){
             return {
+                layerSetShow:false,
+                taskDomain: '',
+
                 textAreaRows: 16, //arg must be Number type 
                 textAreaReadonly: true,
                 logs: [
@@ -53,15 +75,20 @@
                 ]
             }
         }
+        ,created(){
+        }
+        ,mounted(){
+            this.taskDomain = this.current_task.domain || ''
+        }
         ,computed: {
             ...mapGetters(['current_task', 'task_list'])
         }
-        ,created(){
-        }
         ,methods: {
-            ...mapActions(['delTask', 'setCurrentTask'])
+            ...mapActions(['delTask', 'setCurrentTask', 'updateTask'])
+
             ,taskItemClick(item){
                 this.setCurrentTask(item)
+                this.taskDomain = this.current_task.domain || ''
             }
             ,saveLog(v){
                 this.logs.push(v)
@@ -78,6 +105,19 @@
                 }
                 // let path = this.current_task.path
                 util.devTask(this.current_task, this.saveLog)
+            }
+            ,updateInfo(){
+                let task = JSON.parse(JSON.stringify(this.current_task))
+                task.domain = this.taskDomain
+                console.log('new task', task);
+                this.updateTask(task)
+                this.setCurrentTask(task)
+                this.layerSetShow = false
+            }
+            ,buildTask(){
+                console.log('build', 1);
+                util.buildTask(this.current_task, this.saveLog)
+
             }
             ,removeTask(){
                 this.saveLog({ cont: '开始删除项目' + this.current_task.name })
@@ -119,4 +159,9 @@
     .log_wrap .i_ok {color: #67C23A;}
     .log_wrap .i_error {color: #F56C6C;}
     .log_wrap .i_info {color: #E6A23C;}
+
+    .project_add .row { margin: 10px 0; }
+    .project_add .row_hd { color: #999; padding: 5px 0; }
+    .project_add .row_btn { padding: 15px 0 0; } 
+    .project_add .row_btn button { margin-right: 10px; }
 </style>
