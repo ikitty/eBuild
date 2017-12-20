@@ -5,7 +5,9 @@ import del from 'del'
 import async from 'async'
 import browserSync from 'browser-sync'
 import gulpWatch from 'gulp-watch'
+import gulpIf from 'gulp-if'
 import gulpReplace from 'gulp-replace'
+import gulpPxToRem from 'gulp-px2rem'
 import gulpEncode from 'gulp-convert-encoding'
 
 let imgPrefix = '//game.gtimg.cn/images/'
@@ -29,6 +31,11 @@ const startServer = function (rootPath, cb) {
     cb();
 }
 
+const stopTask = (sendLog)=>{
+    BS.exit()
+    sendLog({cont: '停止本地预览', ret: 'ok'})
+}
+
 const getRelativePath = (path)=>{
     // winPath is : c:\\desktop\\xxx\\yyy , BUT macPath is: /xx/yy/zz
     let reg = /[\\\/]\w+[\\\/]src[\\\/].*/g  
@@ -36,7 +43,7 @@ const getRelativePath = (path)=>{
     return ret && ret[0] || ''
 }
 
-const devTask = (task, sendLog, cb)=>{
+const startTask = (doBuild = false, task, sendLog, cb)=>{
     let taskPath = task.path
     imgPrefix = '//game.gtimg.cn/images/' + task.domain + '/act/' + task.name + '/'
 
@@ -48,7 +55,7 @@ const devTask = (task, sendLog, cb)=>{
             js: path.join(taskPath, './src/js/**/*'),
             img: path.join(taskPath, './src/images/**/*')
         },
-        dev: {
+        target: {
             dir: path.join(taskPath, './dev'),
             html: path.join(taskPath, './dev/'),
             css: path.join(taskPath, './dev/css'),
@@ -56,6 +63,15 @@ const devTask = (task, sendLog, cb)=>{
             img: path.join(taskPath, './dev/images')
         }
     };
+    if (doBuild) {
+        paths.target = {
+            dir: path.join(taskPath, './build'),
+            html: path.join(taskPath, './build/'),
+            css: path.join(taskPath, './build/css'),
+            js: path.join(taskPath, './build/js'),
+            img: path.join(taskPath, './build/ossweb-img')
+        }
+    }
 
     function doCopy(type, file, cb) {
         var modify 
@@ -67,7 +83,7 @@ const devTask = (task, sendLog, cb)=>{
         }
 
         gulp.src(file, {base: paths.src.dir})
-            .pipe(gulp.dest(paths.dev.dir))
+            .pipe(gulp.dest(paths.target.dir))
             .on('end', function () {
                 sendLog({cont: '更新' + modify , ret:'ok'})
                 cb && cb()
@@ -75,16 +91,21 @@ const devTask = (task, sendLog, cb)=>{
             });
     }
 
+    //HTML
     function compileHtml(cb) {
         gulp.src(paths.src.html, {base: paths.src.dir})
-            //todo charset check
-            .pipe(gulpEncode({ from: 'gbk', to: 'utf-8'}))
-            .pipe(gulpReplace('charset="gbk"', 'charset="utf-8"')) 
-            .pipe(gulpReplace('src="images/', 'src="' + imgPrefix ))
-            .pipe(gulpReplace('http://', '//' ))
+            //must convert to utf8
+            .pipe(gulpEncode({from: 'gbk',to: 'utf-8'}) )
 
-            // .pipe(gulpEncode({ to: 'gbk'}))  dev just use utf-8
-            .pipe(gulp.dest(paths.dev.dir))
+            .pipe(gulpIf( !doBuild, gulpReplace(/charset="\w+"/gi, 'charset="utf-8"')  ))
+            .pipe(gulpReplace(/(src|href)=('|")https?:\/\//gi, '$1=$2//' ))
+
+            //build
+            .pipe(gulpIf( doBuild, gulpReplace('src="images/', 'src="' + imgPrefix) ))
+            // utf-8 for dev (browserSync utf8 only), gbk for build
+            .pipe(gulpIf( doBuild, gulpEncode({from: 'utf-8',to: 'gbk'}) ))
+
+            .pipe(gulp.dest(paths.target.dir))
             .on('end', function () {
                 sendLog({cont:'编译HTML', ret: 'ok'})
                 cb && cb();
@@ -92,12 +113,14 @@ const devTask = (task, sendLog, cb)=>{
             })
     }
 
-    //TODO add px2rem
+    //CSS 
     function compileCSS(cb){
         gulp.src(paths.src.css, {base: paths.src.dir})
-            // todo for build
-            // .pipe(gulpReplace('../images/', imgPrefix ))
-            .pipe(gulp.dest(paths.dev.dir))
+            // for build
+            .pipe(gulpIf( doBuild, gulpReplace('../images/', imgPrefix) ))
+            .pipe(gulpIf( doBuild, gulpPxToRem({ rootValue: 50,  unitPrecision:3, minPx: 1 }) ))
+
+            .pipe(gulp.dest(paths.target.dir))
             .on('end', function () {
                 sendLog({cont:'编译CSS', ret: 'ok'})
                 cb && cb();
@@ -105,7 +128,7 @@ const devTask = (task, sendLog, cb)=>{
             })
 
     }
-    //TODO
+    //JS TODO
     function compileJS(cb){
 
     }
@@ -148,7 +171,6 @@ const devTask = (task, sendLog, cb)=>{
                         sendLog({cont: '删除对应JS文件', ret: 'ok'})
                     });
                 } else {
-                    //TODO isMinify
                     doCopy('js', file);
                 }
                 break;
@@ -162,13 +184,6 @@ const devTask = (task, sendLog, cb)=>{
                     });
                 } else {
                     compileCSS()
-                    //TODO compile css , px2rem, pathReplace
-                    // doCopy('css', file);
-                    // if (ext === '.less') {
-                    //     compileLess();
-                    // } else {
-                    //     doCopy('css', file);
-                    // }
                 }
                 break;
 
@@ -188,9 +203,10 @@ const devTask = (task, sendLog, cb)=>{
     //init
     async.series([
         function (next) {
-            sendLog({cont:'开始清除dev目录文件'})
-            del(paths.dev.dir, {force: true}).then(function () {
-                sendLog({cont:'清除dev目录文件', ret:'ok'})
+            let dirStr = (doBuild ? '打包' : '测试') + '环境目录'
+            sendLog({cont: `开始清除${dirStr}`})
+            del(paths.target.dir, {force: true}).then(function () {
+                sendLog({cont: `成功清除${dirStr}`, ret:'ok'})
                 next();
             })
         },
@@ -202,7 +218,6 @@ const devTask = (task, sendLog, cb)=>{
                 },
                 function (cb) {
                     sendLog({cont:'开始处理CSS文件'})
-                    // doCopy('css', 'all', cb);
                     compileCSS(cb)
                 },
                 function (cb) {
@@ -219,13 +234,24 @@ const devTask = (task, sendLog, cb)=>{
             })
         },
         function (next) {
+            if (doBuild) {
+                next()
+                return
+            }
+
             sendLog({cont:'开始监听src目录中的文件'})
             watch(next);
         },
         function (next) {
+            if (doBuild) {
+                next()
+                return
+            }
+
             sendLog({cont:'开始启动本地服务器'})
-            startServer(paths.dev.dir, function(){
+            startServer(paths.target.dir, function(){
                 sendLog({cont:'启动本地服务器', ret: 'ok'})
+                sendLog({cont:'正在监听项目src目录...', ret: 'ok'})
                 next()
             });
         }
@@ -236,116 +262,4 @@ const devTask = (task, sendLog, cb)=>{
     cb && cb()
 }
 
-const buildTask = (task, sendLog, cb)=>{
-    let taskPath = task.path
-    imgPrefix = '//game.gtimg.cn/images/' + task.domain + '/act/' + task.name + '/'
-
-    let paths = {
-        src: {
-            dir: path.join(taskPath, './src'),
-            html: path.join(taskPath, './src/*.{html,htm,shtml}'), //glob pattern
-            css: path.join(taskPath, './src/css/**/*'),
-            js: path.join(taskPath, './src/js/**/*'),
-            img: path.join(taskPath, './src/images/**/*')
-        },
-        build: {
-            dir: path.join(taskPath, './build'),
-            html: path.join(taskPath, './build/'),
-            css: path.join(taskPath, './build/css'),
-            js: path.join(taskPath, './build/js'),
-            img: path.join(taskPath, './build/images')
-        }
-    };
-
-    function doCopy(type, file, cb) {
-        var modify 
-        if (file == 'all') {
-            file = paths['src'][type]
-            modify = type + '文件' 
-        }else{
-            modify = getRelativePath(file)
-        }
-
-        gulp.src(file, {base: paths.src.dir})
-            .pipe(gulp.dest(paths.build.dir))
-            .on('end', function () {
-                sendLog({cont: '更新' + modify , ret:'ok'})
-                cb && cb()
-                BS.reload()
-            });
-    }
-
-    function compileHtml(cb) {
-        gulp.src(paths.src.html, {base: paths.src.dir})
-            //todo charset check
-            .pipe(gulpEncode({ from: 'gbk', to: 'utf-8'}))
-            // .pipe(gulpReplace('charset="gbk"', 'charset="utf-8"')) 
-            .pipe(gulpReplace('src="images/', 'src="' + imgPrefix ))
-            .pipe(gulpReplace('http://', '//' ))
-
-            .pipe(gulpEncode({ to: 'gbk'}))  
-            .pipe(gulp.dest(paths.build.dir))
-            .on('end', function () {
-                sendLog({cont:'编译HTML', ret: 'ok'})
-                cb && cb();
-                BS.reload()
-            })
-    }
-
-    //TODO add px2rem
-    function compileCSS(cb){
-        gulp.src(paths.src.css, {base: paths.src.dir})
-            .pipe(gulpReplace('../images/', imgPrefix ))
-            .pipe(gulp.dest(paths.build.dir))
-            .on('end', function () {
-                sendLog({cont:'编译CSS', ret: 'ok'})
-                cb && cb();
-                BS.reload()
-            })
-
-    }
-    //TODO
-    function compileJS(cb){
-
-    }
-
-    //init
-    async.series([
-        function (next) {
-            sendLog({cont:'开始清除build目录文件'})
-            del(paths.build.dir, {force: true}).then(function () {
-                sendLog({cont:'清除build目录文件', ret:'ok'})
-                next();
-            })
-        },
-        function (next) {
-            async.parallel([
-                function (cb) {
-                    sendLog({cont:'开始处理IMG文件'})
-                    doCopy('img', 'all',  cb);
-                },
-                function (cb) {
-                    sendLog({cont:'开始处理CSS文件'})
-                    compileCSS(cb)
-                },
-                function (cb) {
-                    sendLog({cont:'开始处理JS文件'})
-                    doCopy('js', 'all',  cb);
-                },
-                function (cb) {
-                    sendLog({cont:'开始编译HTML'})
-                    compileHtml(cb);
-                }
-            ], function (error) {
-                if (error) { throw new Error(error); }
-                next();
-            })
-        }
-    ], function (error) {
-        if (error) { throw new Error(error); }
-    });
-
-    cb && cb()
-}
-
-export { devTask ,buildTask }
+export { startTask, stopTask }

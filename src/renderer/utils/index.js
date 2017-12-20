@@ -3,7 +3,7 @@
 import gulp from 'gulp'
 import path from 'path'
 import del from 'del'
-import {devTask, buildTask} from './devTask'
+import {startTask ,stopTask} from './devTask'
 
 const tempPath = path.join(__dirname, '../template/event/**/*')
 const createTask = (targetPath)=> {
@@ -20,8 +20,7 @@ const deleteTask = (path, cb)=> {
 }
 
 export default {
-    createTask,
-    deleteTask,
-    devTask,
-    buildTask
+    createTask, deleteTask,
+
+    startTask, stopTask
 }

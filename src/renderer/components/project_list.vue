@@ -11,11 +11,11 @@
 
     <div class="main">
         <div class="btns" @click="removeFocusState">
-            <el-button type="" icon="menu" @click="localServe">本地预览</el-button>
+            <el-button type="" icon="x" @click="localServe">{{localServeStatus ? '停止': '开启'}}预览</el-button>
             <el-button type="" icon="check">规范检测</el-button>
             <el-button type="" icon="upload2" @click="buildTask">编译</el-button>
             <el-button type="" icon="setting" @click="layerSetShow=true">设置</el-button>
-            <el-button type="danger" icon="delete2" @click="removeTask">删除</el-button>
+            <el-button type="danger" icon="x" @click="removeTask" plain>删除</el-button>
         </div>
         <div class="hide_input_wrap">
             <input type="button" id="hideInput" class="" value=""/>
@@ -72,7 +72,8 @@
                     {cont:'操作内容', ret: 'ok' }
                     ,{cont:'操作内容', ret: 'fail' }
                     ,{cont:'操作内容', ret: 'info' }
-                ]
+                ],
+                localServeStatus: false
             }
         }
         ,created(){
@@ -103,8 +104,13 @@
                     this.$alert('choose a task plz :)', '提示');
                     return
                 }
-                // let path = this.current_task.path
-                util.devTask(this.current_task, this.saveLog)
+                if (this.localServeStatus) {
+                    util.stopTask(this.saveLog)
+                    this.localServeStatus = false
+                }else{
+                    util.startTask(false, this.current_task, this.saveLog)
+                    this.localServeStatus = true
+                }
             }
             ,updateInfo(){
                 let task = JSON.parse(JSON.stringify(this.current_task))
@@ -116,19 +122,25 @@
             }
             ,buildTask(){
                 console.log('build', 1);
-                util.buildTask(this.current_task, this.saveLog)
+                util.startTask(true, this.current_task, this.saveLog)
 
             }
             ,removeTask(){
-                this.saveLog({ cont: '开始删除项目' + this.current_task.name })
+                this.$confirm('此操作将删除项目和对应的文件, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    this.saveLog({ cont: '开始删除项目' + this.current_task.name })
+                    util.deleteTask(this.current_task.path).then(()=>{
+                        this.saveLog({ cont: '删除项目' + this.current_task.name, ret: 'ok' })
+                        this.delTask(this.current_task)
+                        this.setCurrentTask({})
+                    }).catch(err=>{
+                        this.saveLog({cont: '删除项目失败：' + err.message, ret: 'fail'})
+                    })
+                });
 
-                util.deleteTask(this.current_task.path).then(()=>{
-                    this.saveLog({ cont: '删除项目' + this.current_task.name, ret: 'ok' })
-                    this.delTask(this.current_task)
-                    this.setCurrentTask({})
-                }).catch(err=>{
-                    this.saveLog({cont: '删除项目失败：' + err.message, ret: 'fail'})
-                })
             }
             ,removeFocusState(e){
                 //remove btn focus status to disable focus style  (bad design in element-ui)
