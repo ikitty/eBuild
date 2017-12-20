@@ -23,6 +23,7 @@ a {text-decoration: none; color: #555 }
 a:hover {color:#000}
 .hide {display: none;}
 
+#app {width: 770px;height: 520px;background: #f9f9f9;}
 .fade {transition: all 0.2s ease;}
 .fade-leave-active {opacity:0.0}
 .fade-enter-active {opacity:1}

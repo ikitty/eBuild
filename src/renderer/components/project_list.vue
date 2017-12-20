@@ -12,10 +12,11 @@
     <div class="main">
         <div class="btns" @click="removeFocusState">
             <el-button type="" icon="x" @click="localServe">{{localServeStatus ? '停止': '开启'}}预览</el-button>
-            <el-button type="" icon="check">规范检测</el-button>
+            <el-button type="" icon="check">检测</el-button>
             <el-button type="" icon="upload2" @click="buildTask">编译</el-button>
             <el-button type="" icon="setting" @click="layerSetShow=true">设置</el-button>
             <el-button type="danger" icon="x" @click="removeTask" plain>删除</el-button>
+            <el-button type="warning" icon="x" @click="logs = []" plain>清屏</el-button>
         </div>
         <div class="hide_input_wrap">
             <input type="button" id="hideInput" class="" value=""/>
@@ -166,7 +167,7 @@
     .hide_input_wrap {position: relative;height: 0;overflow: hidden;}
     .hide_input_wrap input {position: absolute;top:0;left: 0;}
 
-    .log_wrap {height: 360px;overflow-y: auto; border: 1px solid #000;border-radius: 3px;padding: 0 10px;background: #333;color: #ddd;word-break: break-all;}
+    .log_wrap {height: 340px;overflow-y: auto; border: 1px solid #000;border-radius: 3px;padding: 0 10px;background: #333;color: #ddd;word-break: break-all;}
     .log_wrap p {margin: 10px 0 ;}
     .log_wrap .i_ok {color: #67C23A;}
     .log_wrap .i_error {color: #F56C6C;}
@@ -176,4 +177,8 @@
     .project_add .row_hd { color: #999; padding: 5px 0; }
     .project_add .row_btn { padding: 15px 0 0; } 
     .project_add .row_btn button { margin-right: 10px; }
+
+    .log_wrap::-webkit-scrollbar { width:10px;}
+    .log_wrap::-webkit-scrollbar-track-piece { background:rgba(0,0,0,0.5);border-radius: 5px; }
+    .log_wrap::-webkit-scrollbar-thumb{ background:#666; border-radius:5px; }
 </style>
