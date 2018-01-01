@@ -82,13 +82,27 @@ const startTask = (doBuild = false, task, sendLog, cb)=>{
             modify = getRelativePath(file)
         }
 
-        gulp.src(file, {base: paths.src.dir})
-            .pipe(gulp.dest(paths.target.dir))
-            .on('end', function () {
-                sendLog({cont: '更新' + modify , ret:'ok'})
-                cb && cb()
-                BS.reload()
-            });
+        //todo update
+        if (type == 'img' ) {
+            console.log('copy for img', file);
+            gulp.src(file, {base: path.join(paths.src.dir , './images') })
+                .pipe(gulp.dest(paths.target[type]))
+                .on('end', function () {
+                    sendLog({cont: '更新' + modify , ret:'ok'})
+                    cb && cb()
+                    BS.reload()
+                });
+        }else{
+
+            gulp.src(file, {base: paths.src.dir})
+                .pipe(gulp.dest(paths.target.dir))
+                .on('end', function () {
+                    sendLog({cont: '更新' + modify , ret:'ok'})
+                    cb && cb()
+                    BS.reload()
+                });
+
+        }
     }
 
     //HTML
