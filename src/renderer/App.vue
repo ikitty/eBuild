@@ -1,5 +1,5 @@
 <template>
-    <div id="app">
+    <div id="app" class="app_wrap">
         <hd></hd>
         <transition name="fade" mode="out-in">
             <router-view class="fade"></router-view>
@@ -19,6 +19,9 @@
 <style>
 * {margin: 0;padding: 0;list-style: none; box-sizing: border-box;}
 body {font: 400 14px/1.5 'Microsoft Yahei', Arial;}
+/* todo remove */
+body {background: #666666;}
+
 a {text-decoration: none; color: #555 }
 a:hover {color:#000}
 .hide {display: none;}
