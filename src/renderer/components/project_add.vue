@@ -114,7 +114,6 @@
     .project_add .row_btn { padding: 15px 0 0; } 
     .project_add .row_btn button { margin-right: 10px; }
 
-    
     .project_add .sel { width: 100%; }
 
 
