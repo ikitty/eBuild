@@ -24,6 +24,7 @@
     },
     "files": [
       "dist/electron/**/*"
+      ,"dist/template/**/*"
     ],
     "dmg": {
       "contents": [

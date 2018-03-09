@@ -1,11 +1,15 @@
 <template>
 <div class="index">
     <router-link to="/project_add">
-        <el-button type="primary" class="btn" >创建项目</el-button>
+        <el-button type="primary" >创建项目</el-button>
     </router-link>
-    <span class="btn_apply" >
+    <span class="btn_apply btn" >
         <input type="file" @change="applyProject($event)" webkitdirectory multiple>
         关联项目
+    </span>
+    <span class="btn_apply" >
+        <input type="file" @change="serveProject($event)" webkitdirectory multiple>
+        快速预览项目
     </span>
 </div>
 </template>
@@ -68,6 +72,24 @@ export default {
                 this.addTask(D)
                 this.$router.push({name: 'projectList'})
             }
+        }
+
+        ,serveProject(e){
+            let files = e.target.files
+            if (!files[0]) { return }
+            let D = {name: files[0].name, path: files[0].path, isPreview: 1} 
+
+            //check taskExist
+            let inTaskList = (value,key)=>{
+                return value.name == D.name 
+            }
+            if (this.task_list.some(inTaskList)){
+                this.$alert('已有同名任务', '提示' );
+                return
+            }
+
+            this.addTask(D)
+            this.$router.push({name: 'projectList'})
         }
     }
 }

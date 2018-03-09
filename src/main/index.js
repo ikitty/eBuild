@@ -21,6 +21,7 @@ if (process.env.NODE_ENV !== 'development') {
     }
 }
 
+// require('electron-debug')({ showDevTools: true })
 
 
 let mainWindow
@@ -39,6 +40,10 @@ function createWindow () {
   })
 
   mainWindow.loadURL(winURL)
+
+  //todo for build test
+  mainWindow.webContents.openDevTools();
+
 
   mainWindow.on('closed', () => {
     mainWindow = null

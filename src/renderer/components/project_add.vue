@@ -85,11 +85,15 @@
                 }
 
                 let path = this.working_dir + '/' + this.taskName + '/'
+
                 //todo deDuplicate
                 util.createTask(path)
                 this.addTask({name: this.taskName, path: path, domain: this.taskDomain});
 
                 this.$router.push({name: 'projectList'})
+
+
+                //todo change defActDir
             }
             ,choosePath(e){
                 let files = e.target.files

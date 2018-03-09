@@ -276,4 +276,12 @@ const startTask = (doBuild = false, task, sendLog, cb)=>{
     cb && cb()
 }
 
-export { startTask, stopTask }
+const serveTask = (task, sendLog, cb = ()=>{} )=>{
+    sendLog({cont:'开始启动本地服务器...', ret: 'info'})
+
+    startServer(task.path, function(){
+        sendLog({cont:'启动本地服务器', ret: 'ok'})
+        cb()
+    });
+}
+export { startTask, stopTask, serveTask }

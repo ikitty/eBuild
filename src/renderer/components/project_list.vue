@@ -70,9 +70,7 @@
                 textAreaRows: 16, //arg must be Number type 
                 textAreaReadonly: true,
                 logs: [
-                    {cont:'操作内容', ret: 'ok' }
-                    ,{cont:'操作内容', ret: 'fail' }
-                    ,{cont:'操作内容', ret: 'info' }
+                    {cont:'系统初始化', ret: 'ok' }
                 ],
                 localServeStatus: false
             }
@@ -109,7 +107,12 @@
                     util.stopTask(this.saveLog)
                     this.localServeStatus = false
                 }else{
-                    util.startTask(false, this.current_task, this.saveLog)
+                    //todo opt
+                    if (this.current_task.isPreview) {
+                        util.serveTask(this.current_task, this.saveLog)
+                    }else{
+                        util.startTask(false, this.current_task, this.saveLog)
+                    }
                     this.localServeStatus = true
                 }
             }
