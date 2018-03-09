@@ -12,3 +12,5 @@ thumbs.db
 .travis.yml
 appveyor.yml
 zUsr/
+.vscode/
+package-lock.json
