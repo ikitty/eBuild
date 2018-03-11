@@ -6,9 +6,11 @@ import async from 'async'
 import browserSync from 'browser-sync'
 import gulpWatch from 'gulp-watch'
 import gulpIf from 'gulp-if'
+import gulpRename from 'gulp-rename'
 import gulpReplace from 'gulp-replace'
 import gulpPxToRem from 'gulp-px2rem'
 import gulpEncode from 'gulp-convert-encoding'
+import gulpToUtf8 from 'gulp-utf8-convert'
 
 let imgPrefix = '//game.gtimg.cn/images/'
 
@@ -277,6 +279,20 @@ const startTask = (doBuild = false, task, sendLog, cb)=>{
 }
 
 const serveTask = (task, sendLog, cb = ()=>{} )=>{
+    //convert 2 utfe
+    let p = [path.join(task.path, './*.{html,htm,shtml}'), '!' + path.join(task.path, './__*.*')]
+    gulp.src(p)
+        .pipe(gulpToUtf8({
+            encNotMatchHandle:function (file) {
+                console.log('file', file);
+            }
+        }) )
+        .pipe( gulpReplace(/charset="\w+"/gi, 'charset="utf-8"')  )
+        .pipe(gulpRename(function(path){
+            path.basename = '__' + path.basename
+        }))
+        .pipe(gulp.dest(task.path))
+
     sendLog({cont:'开始启动本地服务器...', ret: 'info'})
 
     startServer(task.path, function(){
