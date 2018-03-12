@@ -13,5 +13,4 @@ thumbs.db
 appveyor.yml
 zUsr/
 .vscode/
-package-lock.json
 dist/

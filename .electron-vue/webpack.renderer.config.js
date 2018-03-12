@@ -154,6 +154,11 @@ if (process.env.NODE_ENV === 'production') {
         to: path.join(__dirname, '../dist/electron/static'),
         ignore: ['.*']
       }
+      ,{
+        from: path.join(__dirname, '../src/renderer/template'),
+        to: path.join(__dirname, '../dist/template'),
+        ignore: ['.*']
+      }
     ]),
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': '"production"'
