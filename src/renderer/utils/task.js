@@ -14,6 +14,8 @@ import gulpToUtf8 from 'gulp-utf8-convert'
 
 let imgPrefix = '//game.gtimg.cn/images/'
 
+//todo 多个bs实例的控制， 允许多个实例？如何切换？ 单个实例，UI如何提示
+
 const BS = browserSync.create();
 const startServer = function (rootPath, cb) {
     BS.init({
@@ -295,7 +297,10 @@ const serveTask = (task, sendLog, cb = ()=>{} )=>{
 
     sendLog({cont:'开始启动本地服务器...', ret: 'info'})
 
-    startServer(task.path, function(){
+    startServer({
+        baseDir:task.path,
+        directory: true
+    }, function(){
         sendLog({cont:'启动本地服务器', ret: 'ok'})
         cb()
     });
