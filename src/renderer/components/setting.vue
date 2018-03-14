@@ -1,16 +1,17 @@
 <template>
 <div class="project_add">
     <div class="mod_tit">全局设置</div>
-    <div class="row">
+    <!-- todo: remove this field -->
+    <!-- <div class="row">
         <el-checkbox v-model="myConfig.liveReload" >启用LiveReload</el-checkbox>
-    </div>
+    </div> -->
     <div class="row">
         <el-checkbox v-model="myConfig.transRem">开启px2rem</el-checkbox>
-        , 1rem = <el-input class="ipt_ratio" v-model="myConfig.remPxRatio"></el-input> px
+        , 1rem = <el-input class="ipt_ratio" v-model="myConfig.remPxRatio" size="mini"></el-input> px
     </div>
-    <div class="row">
+    <!-- <div class="row">
         <el-checkbox v-model="myConfig.checkSyntax">同步前进行语法检查</el-checkbox>
-    </div>
+    </div> -->
     <div class="row">
         <el-checkbox v-model="myConfig.codeMinify">代码压缩</el-checkbox>
     </div>
@@ -71,7 +72,8 @@
     .project_add .row_btn button {margin-right: 10px;}
     .project_add .sel {width:100%;}
 
-    .ipt_ratio {width: 70px; height: 20px;text-align: center;}
+    .ipt_ratio {width: 70px;}
+    .ipt_ratio input {padding: 0 5px;text-align: center;}
 
 </style>
 

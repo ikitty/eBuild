@@ -3,11 +3,12 @@
     <router-link to="/project_add">
         <el-button type="primary" >创建项目</el-button>
     </router-link>
-    <span class="btn_apply btn" >
+
+    <span class="btn_apply btn_fake" >
         <input type="file" @change="applyProject($event)" webkitdirectory multiple>
         关联项目
     </span>
-    <span class="btn_apply" >
+    <span class="btn_fake" >
         <input type="file" @change="serveProject($event)" webkitdirectory multiple>
         快速预览项目
     </span>
@@ -97,8 +98,10 @@ export default {
 
 <style scoped>
 .index {text-align: center;padding-top: 200px;}
-.index .btn {margin: 0 10px;}
+.index .btn_apply {margin: 0 10px;}
+.index button,
+.index input {font-family:"Microsoft Yahei";}
 
-.btn_apply {position: relative; display: inline-block;width: 100px;height: 40px;background: #39f;text-align: center;line-height: 40px;border-radius: 3px;color: #fff;cursor: pointer;font-family: simsun;}
-.btn_apply input {position: absolute;top:0;left: 0;width: 100%;height: 100%;opacity: 0;overflow: hidden;cursor: pointer;}
+.btn_fake {position: relative; display: inline-block;width: 100px;height: 40px;background: #39f;text-align: center;line-height: 40px;border-radius: 3px;color: #fff;cursor: pointer;}
+.btn_fake input {position: absolute;top:0;left: 0;width: 100%;height: 100%;opacity: 0;overflow: hidden;cursor: pointer;}
 </style>

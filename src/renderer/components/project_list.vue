@@ -11,12 +11,17 @@
 
     <div class="main">
         <div class="btns" @click="removeFocusState">
-            <el-button type="" icon="x" @click="localServe">{{localServeStatus ? '停止': '开启'}}预览</el-button>
-            <el-button type="" icon="check">检测</el-button>
-            <el-button type="" icon="upload2" @click="buildTask">编译</el-button>
-            <el-button type="" icon="setting" @click="layerSetShow=true">设置</el-button>
-            <el-button type="danger" icon="x" @click="removeTask" plain>删除</el-button>
-            <el-button type="warning" icon="x" @click="logs = []" plain>清屏</el-button>
+            <el-button-group>
+                <el-button type="primary" size="medium" @click="localServe">{{localServeStatus ? '停止': '本地'}}预览</el-button>
+                <el-button type="primary" size="medium" icon="check">检测</el-button>
+                <el-button type="primary" size="medium" @click="buildTask">编译</el-button>
+                <el-button type="primary" size="medium" @click="layerSetShow=true">设置</el-button>
+            </el-button-group>
+
+            <el-button-group>
+                <el-button type="info" size="medium" @click="logs = []" >清屏</el-button>
+                <el-button type="danger" size="medium" @click="removeTask" >删除</el-button>
+            </el-button-group>
         </div>
         <div class="hide_input_wrap">
             <input type="button" id="hideInput" class="" value=""/>
@@ -30,16 +35,24 @@
                 <!-- <i v-if="item.ret=='loading'" class="el-icon-loading i_info"></i> -->
             </p>
         </div>
-        <el-dialog title="编辑该项目配置" :visible.sync="layerSetShow" width="50%" >
 
+
+        <el-dialog title="编辑该项目配置" :visible.sync="layerSetShow" width="50%" >
             <div class="project_add">
                 <div class="row">
                     <p class="row_hd">项目域名 </p>
                     <div class="row_bd">
-                        <el-input v-model="taskDomain" type="url">
+                        <el-input v-model="taskDomain" type="url" size="mini">
                             <template slot="append">.qq.com</template>
                         </el-input>
                     </div>
+                </div>
+                <div class="row" style="margin-top:15px;">
+                    <el-checkbox v-model="projConfig.transRem">开启px2rem</el-checkbox>
+                    , 1rem = <el-input class="ipt_ratio" v-model="projConfig.remPxRatio" style="width:70px;" size="mini"></el-input> px
+                </div>
+                <div class="row">
+                    <el-checkbox v-model="projConfig.codeMinify">代码压缩</el-checkbox>
                 </div>
             </div>
 
@@ -70,9 +83,15 @@
                 textAreaRows: 16, //arg must be Number type 
                 textAreaReadonly: true,
                 logs: [
-                    {cont:'系统初始化', ret: 'ok' }
+                    {cont:'系统初始化完毕', ret: 'ok' }
                 ],
                 localServeStatus: false
+
+                ,projConfig: {
+                    transRem: false,
+                    remPxRatio: 0,
+                    codeMinify: false,
+                },
             }
         }
         ,created(){
@@ -89,6 +108,9 @@
             ,taskItemClick(item){
                 this.setCurrentTask(item)
                 this.taskDomain = this.current_task.domain || ''
+                this.projConfig.transRem = this.current_task.transRem || false
+                this.projConfig.remPxRatio = this.current_task.remPxRatio || 0
+                this.projConfig.codeMinify = this.current_task.codeMinify || false
             }
             ,saveLog(v){
                 this.logs.push(v)
@@ -119,6 +141,10 @@
             ,updateInfo(){
                 let task = JSON.parse(JSON.stringify(this.current_task))
                 task.domain = this.taskDomain
+                task.transRem = this.projConfig.transRem
+                task.remPxRatio = this.projConfig.remPxRatio
+                task.codeMinify = this.projConfig.codeMinify
+
                 console.log('new task', task);
                 this.updateTask(task)
                 this.setCurrentTask(task)
@@ -155,22 +181,25 @@
 </script>
 
 <style scoped>
-    .list {padding: 0px 0 ;height: 440px;;overflow: hidden;}
-    .side {float:left;width: 200px;height: 100%;background: #f9f9f9;border-right: 1px solid #ddd;}
-    .side_hd {height: 40px;font-size:14px;font-weight:700;line-height:40px;padding-left:15px;color: #000; background: #E8E8E8;}
-    .side_hd span {font-family: simsun;}
-    .side_list_wrap {height:400px;overflow-y:scroll;}
+    .list {padding: 0px 0 ;height: 470px;;overflow: hidden;}
+    .side {float:left;width: 220px;height: 100%;background: #f9f9f9;border-right: 1px solid #ddd;}
+
+    .side_hd {display:none;height: 40px;font-size:14px;line-height:40px;padding-left:15px;color: #000; background: #E8E8E8;}
+    .side_hd span {font-family: simsun;color: #666;}
+
+    .side_list_wrap {height:470px;padding-top:10px;overflow-y:scroll;background-color: #fdfdfd;}
     .side_list {padding-left: 15px;}
     .side_list li {height: 50px;line-height: 50px;border-bottom: 1px dotted #ddd;cursor: pointer;}
     .side_list li.click {color: #39f;cursor: default;}
 
-    .main {float:left;width: 570px;height: 100%;padding: 20px}
+    .main {float:left;width: 580px;height: 100%;padding: 20px}
     .btns {padding-bottom: 20px;}
+    .el-button-group+.el-button-group {margin-left: 10px;}
 
     .hide_input_wrap {position: relative;height: 0;overflow: hidden;}
     .hide_input_wrap input {position: absolute;top:0;left: 0;}
 
-    .log_wrap {height: 340px;overflow-y: auto; border: 1px solid #000;border-radius: 3px;padding: 0 10px;background: #333;color: #ddd;word-break: break-all;}
+    .log_wrap {height: 370px;overflow-y: auto; border: 1px solid #000;border-radius: 3px;padding: 0 10px;background: #333;color: #ddd;word-break: break-all;}
     .log_wrap p {margin: 10px 0 ;}
     .log_wrap .i_ok {color: #67C23A;}
     .log_wrap .i_error {color: #F56C6C;}
