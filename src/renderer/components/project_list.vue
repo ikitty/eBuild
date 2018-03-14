@@ -13,7 +13,7 @@
         <div class="btns" @click="removeFocusState">
             <el-button-group>
                 <el-button type="primary" size="medium" @click="localServe">{{localServeStatus ? '停止': '本地'}}预览</el-button>
-                <el-button type="primary" size="medium" icon="check">检测</el-button>
+                <el-button type="primary" size="medium" @click="checkSyntax">检测</el-button>
                 <el-button type="primary" size="medium" @click="buildTask">编译</el-button>
                 <el-button type="primary" size="medium" @click="layerSetShow=true">设置</el-button>
             </el-button-group>
@@ -130,6 +130,7 @@
                     this.localServeStatus = false
                 }else{
                     //todo opt
+                    this.saveLog({cont:'~~~~~ Let\'s Go! ~~~~~' })
                     if (this.current_task.isPreview) {
                         util.serveTask(this.current_task, this.saveLog)
                     }else{
@@ -152,6 +153,7 @@
             }
             ,buildTask(){
                 console.log('build', 1);
+                this.saveLog({cont:'~~~~~ Let\'s Go! ~~~~~' })
                 util.startTask(true, this.current_task, this.saveLog)
 
             }
@@ -175,6 +177,10 @@
             ,removeFocusState(e){
                 //remove btn focus status to disable focus style  (bad design in element-ui)
                 document.getElementById('hideInput').focus()
+            }
+            ,checkSyntax(){
+                this.saveLog({cont: '开始检测语法...', ret: 'info'})
+                //todo imgSize, eslint etc.
             }
         }
     }

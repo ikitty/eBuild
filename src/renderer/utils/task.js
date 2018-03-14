@@ -11,6 +11,8 @@ import gulpReplace from 'gulp-replace'
 import gulpPxToRem from 'gulp-px2rem'
 import gulpEncode from 'gulp-convert-encoding'
 import gulpToUtf8 from 'gulp-utf8-convert'
+import gulpUglify from 'gulp-uglify'
+
 
 let imgPrefix = '//game.gtimg.cn/images/'
 
@@ -137,6 +139,7 @@ const startTask = (doBuild = false, task, sendLog, cb)=>{
             // for build
             .pipe(gulpIf( doBuild, gulpReplace('../images/', imgPrefix) ))
             .pipe(gulpIf( doBuild, gulpPxToRem({ rootValue: 50,  unitPrecision:3, minPx: 1 }) ))
+            //todo css min
 
             .pipe(gulp.dest(paths.target.dir))
             .on('end', function () {
@@ -148,7 +151,16 @@ const startTask = (doBuild = false, task, sendLog, cb)=>{
     }
     //JS TODO
     function compileJS(cb){
+        gulp.src(paths.src.js, {base: paths.src.dir})
+            .pipe(gulpIf( doBuild, gulpReplace('../images/', imgPrefix) ))
+            .pipe(gulpIf( doBuild, gulpUglify() ))
 
+            .pipe(gulp.dest(paths.target.dir))
+            .on('end', function () {
+                sendLog({cont:'编译JS', ret: 'ok'})
+                cb && cb();
+                BS.reload()
+            })
     }
 
     //监听文件
@@ -240,7 +252,8 @@ const startTask = (doBuild = false, task, sendLog, cb)=>{
                 },
                 function (cb) {
                     sendLog({cont:'开始处理JS文件'})
-                    doCopy('js', 'all',  cb);
+                    compileJS(cb)
+                    // doCopy('js', 'all',  cb);
                 },
                 function (cb) {
                     sendLog({cont:'开始编译HTML'})

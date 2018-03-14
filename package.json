@@ -63,6 +63,7 @@
     "gulp-px2rem": "1.0.11",
     "gulp-rename": "1.2.2",
     "gulp-replace": "0.6.1",
+    "gulp-uglify": "3.0.0",
     "gulp-utf8-convert": "0.0.7",
     "gulp-watch": "^4.3.11",
     "vue": "^2.4.4",
