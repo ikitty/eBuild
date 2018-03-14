@@ -7,7 +7,8 @@ import {startTask ,stopTask, serveTask} from './task'
 
 const tempPath = path.join(__dirname, '../template/event/**/*')
 const createTask = (targetPath)=> {
-    // console.log('temppath is ', tempPath);
+    //todo 第一次运行的时候总会有点问题，随便加个注释什么的就正常了。 奇怪
+    console.log('temppath is ', tempPath);
     gulp.src(tempPath)
         .pipe(gulp.dest(targetPath))
         .on('end', ()=>{

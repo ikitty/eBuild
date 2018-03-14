@@ -284,15 +284,16 @@ const serveTask = (task, sendLog, cb = ()=>{} )=>{
     //convert 2 utfe
     let p = [path.join(task.path, './*.{html,htm,shtml}'), '!' + path.join(task.path, './__*.*')]
     gulp.src(p)
+        .pipe(gulpRename(function(path){
+            path.basename = '__' + path.basename
+            path.extname = '.html' 
+        }))
         .pipe(gulpToUtf8({
             encNotMatchHandle:function (file) {
-                console.log('file', file);
+                console.log('file not match: ', file);
             }
         }) )
         .pipe( gulpReplace(/charset="\w+"/gi, 'charset="utf-8"')  )
-        .pipe(gulpRename(function(path){
-            path.basename = '__' + path.basename
-        }))
         .pipe(gulp.dest(task.path))
 
     sendLog({cont:'开始启动本地服务器...', ret: 'info'})
