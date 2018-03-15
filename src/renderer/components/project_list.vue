@@ -100,7 +100,7 @@
             this.taskDomain = this.current_task.domain || ''
         }
         ,computed: {
-            ...mapGetters(['current_task', 'task_list'])
+            ...mapGetters(['current_task', 'task_list', 'config'])
         }
         ,methods: {
             ...mapActions(['delTask', 'setCurrentTask', 'updateTask'])
@@ -134,7 +134,7 @@
                     if (this.current_task.isPreview) {
                         util.serveTask(this.current_task, this.saveLog)
                     }else{
-                        util.startTask(false, this.current_task, this.saveLog)
+                        util.startTask(false, this.current_task, this.config, this.saveLog)
                     }
                     this.localServeStatus = true
                 }
@@ -152,10 +152,12 @@
                 this.layerSetShow = false
             }
             ,buildTask(){
-                console.log('build', 1);
+                if (!this.taskDomain) {
+                    this.$alert('请点击“设置”按钮配置该项目的域名', '提示');
+                    return
+                }
                 this.saveLog({cont:'~~~~~ Let\'s Go! ~~~~~' })
-                util.startTask(true, this.current_task, this.saveLog)
-
+                util.startTask(true, this.current_task, this.config, this.saveLog)
             }
             ,removeTask(){
                 this.$confirm('此操作将删除项目和对应的文件, 是否继续?', '提示', {

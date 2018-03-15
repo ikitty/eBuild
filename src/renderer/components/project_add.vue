@@ -25,7 +25,7 @@
             </div>
         </div>
         <div class="row">
-            <p class="row_hd">项目生成路径 (默认生成到全局工具目录)</p>
+            <p class="row_hd">项目生成路径</p>
             <div class="row_bd">
                 <span class="btn_apply" >
                     <span >{{working_dir}} </span>
