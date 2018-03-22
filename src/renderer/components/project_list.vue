@@ -48,8 +48,8 @@
                     </div>
                 </div>
                 <div class="row" style="margin-top:15px;">
-                    <el-checkbox v-model="projConfig.transRem">开启px2rem</el-checkbox>
-                    , 1rem = <el-input class="ipt_ratio" v-model="projConfig.remPxRatio" style="width:70px;" size="mini"></el-input> px
+                    <el-checkbox v-model="transRem">开启px2rem</el-checkbox>
+                    , 1rem = <el-input class="ipt_ratio" v-model="projConfig.remRatio" style="width:70px;" size="mini"></el-input> px
                 </div>
                 <div class="row">
                     <el-checkbox v-model="projConfig.codeMinify">代码压缩</el-checkbox>
@@ -58,7 +58,7 @@
 
             <span slot="footer" class="dialog-footer">
                 <el-button @click="layerSetShow = false">取 消</el-button>
-                <el-button type="primary" @click="updateInfo">确 定</el-button>
+                <el-button type="primary" @click="saveConfig">确 定</el-button>
             </span>
         </el-dialog>
 
@@ -82,15 +82,12 @@
 
                 textAreaRows: 16, //arg must be Number type 
                 textAreaReadonly: true,
-                logs: [
-                    {cont:'系统初始化完毕', ret: 'ok' }
-                ],
+                logs: [ {cont:'系统初始化完毕', ret: 'ok' } ],
                 localServeStatus: false
 
-                // todo get data 
+                ,transRem: false
                 ,projConfig: {
-                    transRem: false,
-                    remPxRatio: 0,
+                    remRatio: 0,
                     codeMinify: false,
                 },
             }
@@ -98,7 +95,7 @@
         ,created(){
         }
         ,mounted(){
-            this.taskDomain = this.current_task.domain || ''
+            this.renderConfig(this.current_task)
         }
         ,computed: {
             ...mapGetters(['current_task', 'task_list', 'config'])
@@ -108,10 +105,16 @@
 
             ,taskItemClick(item){
                 this.setCurrentTask(item)
-                this.taskDomain = this.current_task.domain || ''
-                this.projConfig.transRem = this.current_task.transRem || false
-                this.projConfig.remPxRatio = this.current_task.remPxRatio || 0
-                this.projConfig.codeMinify = this.current_task.codeMinify || false
+                this.renderConfig(this.current_task)
+            }
+            ,renderConfig(task){
+                this.taskDomain = task.domain || ''
+
+                let config = task.config || {}
+                this.projConfig.remRatio = config.remRatio || 0
+                this.projConfig.codeMinify = config.codeMinify || false
+
+                this.transRem = 1*this.projConfig.remRatio ? true : false
             }
             ,saveLog(v){
                 this.logs.push(v)
@@ -140,14 +143,21 @@
                     this.localServeStatus = true
                 }
             }
-            ,updateInfo(){
+            ,saveConfig(){
                 let task = JSON.parse(JSON.stringify(this.current_task))
                 task.domain = this.taskDomain
-                task.transRem = this.projConfig.transRem
-                task.remPxRatio = this.projConfig.remPxRatio
-                task.codeMinify = this.projConfig.codeMinify
 
-                console.log('new task', task);
+                if (!this.transRem) {
+                    this.projConfig.remRatio = 0
+                }
+                if (1*this.projConfig.remRatio == 0) {
+                    this.transRem = false
+                }
+
+                task.config = task.config || {}
+                task.config.remRatio = this.projConfig.remRatio
+                task.config.codeMinify = this.projConfig.codeMinify
+
                 this.updateTask(task)
                 this.setCurrentTask(task)
                 this.layerSetShow = false
