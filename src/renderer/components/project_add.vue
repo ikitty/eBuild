@@ -71,7 +71,7 @@
             ...mapGetters(['working_dir', 'task_list'])
         }
         ,methods: {
-            ...mapActions(['addTask' , 'setWorkingDir'])
+            ...mapActions(['addTask' , 'setWorkingDir' , 'setCurrentTask'])
             ,createProj() {
                 if (!this.taskName || !this.taskDomain || !this.working_dir){
                     this.$alert('所有字段内容不能为空', '提示' );
@@ -86,14 +86,12 @@
 
                 let path = this.working_dir + '/' + this.taskName + '/'
 
-                //todo deDuplicate
-                util.createTask(path)
-                this.addTask({name: this.taskName, path: path, domain: this.taskDomain});
-
-                this.$router.push({name: 'projectList'})
-
-
-                //todo change defActDir
+                util.createTask(path).then(()=>{
+                    let item = {name: this.taskName, path: path, domain: this.taskDomain}
+                    this.addTask(item)
+                    this.setCurrentTask(item)
+                    this.$router.push({name: 'projectList'})
+                })
             }
             ,choosePath(e){
                 let files = e.target.files

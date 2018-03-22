@@ -87,6 +87,7 @@
                 ],
                 localServeStatus: false
 
+                // todo get data 
                 ,projConfig: {
                     transRem: false,
                     remPxRatio: 0,
@@ -169,7 +170,8 @@
                     util.deleteTask(this.current_task.path).then(()=>{
                         this.saveLog({ cont: '删除项目' + this.current_task.name, ret: 'ok' })
                         this.delTask(this.current_task)
-                        this.setCurrentTask({})
+                        this.setCurrentTask(this.task_list[0])
+
                     }).catch(err=>{
                         this.saveLog({cont: '删除项目失败：' + err.message, ret: 'fail'})
                     })

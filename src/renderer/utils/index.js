@@ -9,11 +9,15 @@ const tempPath = path.join(__dirname, '../template/event/**/*')
 const createTask = (targetPath)=> {
     //todo 第一次运行的时候总会有点问题，随便加个注释什么的就正常了。 奇怪
     console.log('temppath is ', tempPath);
-    gulp.src(tempPath)
-        .pipe(gulp.dest(targetPath))
-        .on('end', ()=>{
-            console.log('Util.createTask: Ok');
-        })
+    return new Promise((resolve, reject) => {
+        gulp.src(tempPath)
+            .pipe(gulp.dest(targetPath))
+            .on('end', ()=>{
+                console.log('Util.createTask: Ok');
+                resolve()
+            })
+    })
+
 }
 
 //Del task path
