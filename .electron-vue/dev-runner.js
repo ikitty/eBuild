@@ -64,7 +64,8 @@ function startRenderer () {
       {
         contentBase: path.join(__dirname, '../'),
         quiet: true,
-        setup (app, ctx) {
+        // setup (app, ctx) { --enix
+        before (app, ctx) {
           app.use(hotMiddleware)
           ctx.middleware.waitUntilValid(() => {
             resolve()
