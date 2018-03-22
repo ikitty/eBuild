@@ -4,8 +4,8 @@ import { app, BrowserWindow } from 'electron'
  * Set `__static` path to static files in production
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
  */
-let appWidth = 770
-let appHeight = 520
+let appWidth = 800
+let appHeight = 550
 
 if (process.env.NODE_ENV !== 'development') {
     global.__static = require('path').join(__dirname, '/static').replace(/\\/g, '\\\\')
