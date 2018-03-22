@@ -9,6 +9,9 @@
         <el-checkbox v-model="myConfig.checkSyntax">同步前进行语法检查</el-checkbox>
     </div> -->
     <div class="row">
+        <el-checkbox v-model="myConfig.autoPrefix">CSS补齐前缀</el-checkbox>
+    </div>
+    <div class="row">
         <el-checkbox v-model="myConfig.codeMinify">代码压缩</el-checkbox>
     </div>
     <div class="row">
@@ -31,6 +34,7 @@
             return {
                 transRem: false,
                 myConfig: {
+                    autoPrefix:false,
                     remRatio: 50,
                     codeMinify: false,
                     removeProtocolHead: true
@@ -57,7 +61,7 @@
                     this.myConfig.remRatio = 0
                 }
                 this.saveConfig(this.myConfig)
-                this.$router.push({name: 'index'})
+                this.$router.back(-1)
             }
         }
     }

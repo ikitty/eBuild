@@ -52,6 +52,9 @@
                     , 1rem = <el-input class="ipt_ratio" v-model="projConfig.remRatio" style="width:70px;" size="mini"></el-input> px
                 </div>
                 <div class="row">
+                    <el-checkbox v-model="projConfig.autoPrefix">CSS补齐前缀</el-checkbox>
+                </div>
+                <div class="row">
                     <el-checkbox v-model="projConfig.codeMinify">代码压缩</el-checkbox>
                 </div>
             </div>
@@ -88,6 +91,7 @@
                 ,transRem: false
                 ,projConfig: {
                     remRatio: 0,
+                    autoPrefix: false,
                     codeMinify: false,
                 },
             }
@@ -113,6 +117,7 @@
                 let config = task.config || {}
                 this.projConfig.remRatio = config.remRatio || 0
                 this.projConfig.codeMinify = config.codeMinify || false
+                this.projConfig.autoPrefix = config.autoPrefix || false
 
                 this.transRem = 1*this.projConfig.remRatio ? true : false
             }
@@ -157,6 +162,7 @@
                 task.config = task.config || {}
                 task.config.remRatio = this.projConfig.remRatio
                 task.config.codeMinify = this.projConfig.codeMinify
+                task.config.autoPrefix = this.projConfig.autoPrefix
 
                 this.updateTask(task)
                 this.setCurrentTask(task)

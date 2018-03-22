@@ -8,12 +8,14 @@ import gulpWatch from 'gulp-watch'
 import gulpIf from 'gulp-if'
 import gulpRename from 'gulp-rename'
 import gulpReplace from 'gulp-replace'
-import gulpPxToRem from 'gulp-px2rem'
 import gulpEncode from 'gulp-convert-encoding'
 import gulpToUtf8 from 'gulp-utf8-convert'
 import gulpUglify from 'gulp-uglify'
-import gulpCssNano from 'gulp-cssnano'
-import gulpAutoPrefix from 'gulp-autoprefixer'
+
+import gulpPostcss from 'gulp-postcss'
+import cssNano from 'cssnano'
+import autoPrefix from 'autoprefixer'
+import pxRem from 'postcss-px2rem'
 
 
 let imgPrefix = '//game.gtimg.cn/images/'
@@ -52,18 +54,15 @@ const getRelativePath = (path)=>{
 }
 
 // compute proj config
-const getConfig = (task, global) =>{
-    let config = JSON.parse(JSON.stringify(global)) 
-    for(let key in task){
-        if (!task.hasOwnProperty(key)) {
-            continue
-        }
-        if (config[key] != null) {
-            config[key] = task[key]
+const getConfig = (_config = {}, globalConfig) =>{
+    let config = JSON.parse(JSON.stringify(globalConfig)) 
+    for(let key in _config){
+        if (!_config.hasOwnProperty(key)) { continue }
+
+        if (_config[key] != null) {
+            config[key] = _config[key]
         }
     }
-
-    //新建项目时从默认配置继承过来。略烦。绕莱绕去
 
     return config ;
 }
@@ -72,7 +71,8 @@ const startTask = (doBuild = false, task, globalConfig, sendLog, cb)=>{
     let taskPath = task.path
     imgPrefix = '//game.gtimg.cn/images/' + task.domain + '/act/' + task.name + '/'
 
-    let config = getConfig(task, globalConfig)
+    let config = getConfig(task.config, globalConfig)
+    console.log('final config', config);
 
     let paths = {
         src: {
@@ -156,13 +156,17 @@ const startTask = (doBuild = false, task, globalConfig, sendLog, cb)=>{
 
     //CSS 
     function compileCSS(cb){
+        let plugins = []
+        if (doBuild) {
+            config.autoPrefix && ( plugins.push(autoPrefix({browsers: ['last 2 version']})) )
+            1*config.remRatio && ( plugins.push(pxRem({remUnit: config.remRatio})) )
+            config.codeMinify && ( plugins.push(cssNano()) )
+        }
+
         gulp.src(paths.src.css, {base: paths.src.dir})
             // for build
             .pipe(gulpIf( doBuild, gulpReplace('../images/', imgPrefix) ))
-            //todo get pxRemRatio
-            .pipe(gulpIf( doBuild, gulpPxToRem({ rootValue: 50,  unitPrecision:3, minPx: 1 }) ))
-            .pipe(gulpIf( doBuild && config.codeMinify, gulpCssNano() ))
-            //todo css auto prefix
+            .pipe(gulpPostcss(plugins))
 
             .pipe(gulp.dest(paths.target.dir))
             .on('end', function () {
@@ -170,6 +174,7 @@ const startTask = (doBuild = false, task, globalConfig, sendLog, cb)=>{
                 cb && cb();
                 BS.reload()
             })
+        
 
     }
     //JS
@@ -288,20 +293,13 @@ const startTask = (doBuild = false, task, globalConfig, sendLog, cb)=>{
             })
         },
         function (next) {
-            if (doBuild) {
-                next()
-                return
-            }
+            //stop build process
+            if (doBuild) { return }
 
             sendLog({cont:'开始监听src目录中的文件'})
             watch(next);
         },
         function (next) {
-            if (doBuild) {
-                next()
-                return
-            }
-
             sendLog({cont:'开始启动本地服务器'})
             startServer(paths.target.dir, function(){
                 sendLog({cont:'启动本地服务器', ret: 'ok'})
