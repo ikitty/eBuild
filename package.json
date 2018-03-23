@@ -1,8 +1,8 @@
 {
   "name": "ebuild",
-  "version": "0.0.0",
-  "author": "alex",
-  "description": "FE workflow tool with electron-vue",
+  "version": "1.0.0",
+  "author": "alextang",
+  "description": "eBuild (easy build), a Front-end workflow tool with electron-vue",
   "license": null,
   "main": "./dist/electron/main.js",
   "scripts": {
@@ -18,7 +18,7 @@
   },
   "build": {
     "productName": "ebuild",
-    "appId": "org.simulatedgreg.electron-vue",
+    "appId": "org.tc.ebuild",
     "directories": {
       "output": "build"
     },
@@ -62,6 +62,7 @@
     "gulp": "^3.9.1",
     "gulp-convert-encoding": "1.0.0",
     "gulp-if": "2.0.2",
+    "gulp-pngquant": "1.0.12",
     "gulp-postcss": "7.0.1",
     "gulp-rename": "1.2.2",
     "gulp-replace": "0.6.1",
