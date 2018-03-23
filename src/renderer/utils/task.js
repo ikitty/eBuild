@@ -16,6 +16,7 @@ import gulpPostcss from 'gulp-postcss'
 import cssNano from 'cssnano'
 import autoPrefix from 'autoprefixer'
 import pxRem from 'postcss-px2rem'
+import gulpPngQuant from 'gulp-pngquant'
 
 
 let imgPrefix = '//game.gtimg.cn/images/'
@@ -109,27 +110,13 @@ const startTask = (doBuild = false, task, globalConfig, sendLog, cb)=>{
             modify = getRelativePath(file)
         }
 
-        //todo update
-        if (type == 'img' ) {
-            console.log('copy for img', file);
-            gulp.src(file, {base: path.join(paths.src.dir , './images') })
-                .pipe(gulp.dest(paths.target[type]))
-                .on('end', function () {
-                    sendLog({cont: '更新' + modify , ret:'ok'})
-                    cb && cb()
-                    BS.reload()
-                });
-        }else{
-
-            gulp.src(file, {base: paths.src.dir})
-                .pipe(gulp.dest(paths.target.dir))
-                .on('end', function () {
-                    sendLog({cont: '更新' + modify , ret:'ok'})
-                    cb && cb()
-                    BS.reload()
-                });
-
-        }
+        gulp.src(file, {base: paths.src.dir})
+            .pipe(gulp.dest(paths.target.dir))
+            .on('end', function () {
+                sendLog({cont: '更新' + modify , ret:'ok'})
+                cb && cb()
+                BS.reload()
+            });
     }
 
     //HTML
@@ -174,8 +161,6 @@ const startTask = (doBuild = false, task, globalConfig, sendLog, cb)=>{
                 cb && cb();
                 BS.reload()
             })
-        
-
     }
     //JS
     function compileJS(cb){
@@ -186,6 +171,21 @@ const startTask = (doBuild = false, task, globalConfig, sendLog, cb)=>{
             .pipe(gulp.dest(paths.target.dir))
             .on('end', function () {
                 sendLog({cont:'编译JS', ret: 'ok'})
+                cb && cb();
+                BS.reload()
+            })
+    }
+
+    //IMG
+    function compileImg(cb){
+        gulp.src(paths.src.img, {base: path.join(paths.src.dir , './images') })
+            .pipe(gulpIf( doBuild, gulpPngQuant({quality: '70-80'}) ))
+
+            //todo if dev justCopy , send copy info
+            //else compress img , send compress info
+            .pipe(gulp.dest(paths.target.img))
+            .on('end', function () {
+                sendLog({cont:'压缩图片', ret: 'ok'})
                 cb && cb();
                 BS.reload()
             })
@@ -272,7 +272,7 @@ const startTask = (doBuild = false, task, globalConfig, sendLog, cb)=>{
             async.parallel([
                 function (cb) {
                     sendLog({cont:'开始处理IMG文件'})
-                    doCopy('img', 'all',  cb);
+                    compileImg(cb)
                 },
                 function (cb) {
                     sendLog({cont:'开始处理CSS文件'})
@@ -281,7 +281,6 @@ const startTask = (doBuild = false, task, globalConfig, sendLog, cb)=>{
                 function (cb) {
                     sendLog({cont:'开始处理JS文件'})
                     compileJS(cb)
-                    // doCopy('js', 'all',  cb);
                 },
                 function (cb) {
                     sendLog({cont:'开始编译HTML'})
