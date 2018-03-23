@@ -21,6 +21,7 @@
             <el-button-group>
                 <el-button type="info" size="medium" @click="logs = []" >清屏</el-button>
                 <el-button type="danger" size="medium" @click="removeTask" >删除</el-button>
+                <el-button type="success" size="medium" @click="changeFooter" >Foot</el-button>
             </el-button-group>
         </div>
         <div class="hide_input_wrap">
@@ -201,6 +202,9 @@
             ,checkSyntax(){
                 this.saveLog({cont: '开始检测语法...', ret: 'info'})
                 //todo imgSize, eslint etc.
+            }
+            ,changeFooter(){
+                util.replaceFooter(this.current_task, this.saveLog)
             }
         }
     }

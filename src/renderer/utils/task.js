@@ -339,4 +339,34 @@ const serveTask = (task, sendLog, cb = ()=>{} )=>{
         cb()
     });
 }
-export { startTask, stopTask, serveTask }
+
+//temp
+const replaceFooter = (task, sendLog)=>{
+    let taskPath = task.path
+    let paths = {
+        src: {
+            dir: taskPath,
+            html: path.join(taskPath, './*.{html,htm,shtml}'), //glob pattern
+        },
+        target: {
+            dir: path.join(taskPath, './updateFooter'),
+            html: path.join(taskPath, './updateFooter/'),
+        }
+    };
+
+    gulp.src(paths.src.html, {base: paths.src.dir})
+        //must convert to utf8
+        .pipe(gulpEncode({from: 'gbk',to: 'utf-8'}) )
+
+        .pipe( gulpReplace('<script src="http://ossweb-img.qq.com/images/js/foot.js"></script>', '<!--#include virtual="/web201503/footer_simple.htm" -->' ) )
+        
+        .pipe( gulpEncode({from: 'utf-8',to: 'gbk'}) )
+
+        .pipe(gulp.dest(paths.target.dir))
+        .on('end', function () {
+            sendLog({cont:'Update HTML', ret: 'ok'})
+        })
+
+}
+
+export { startTask, stopTask, serveTask ,replaceFooter }
