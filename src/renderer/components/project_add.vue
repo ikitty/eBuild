@@ -54,11 +54,11 @@
             return {
                 taskDomain: 'pvp',
                 taskName: '',
-                taskTemplate: 'templateDefault', //todo
+                taskTemplate: 'templateMobile', 
 
                 templates: [
-                    {value:'templateDefault',label:'默认活动模板'},
-                    // {value:'templateXycq',label:'轩辕传奇活动模板'}
+                    {value:'templateMobile',label:'移动端活动模板'},
+                    {value:'templatePc',label:'PC端活动模板'}
                 ]
             }
         }
@@ -86,8 +86,8 @@
 
                 let path = this.working_dir + '/' + this.taskName + '/'
 
-                util.createTask(path).then(()=>{
-                    let item = {name: this.taskName, path: path, domain: this.taskDomain}
+                util.createTask(path, this.taskTemplate).then(()=>{
+                    let item = {name: this.taskName, path: path, domain: this.taskDomain, template: this.taskTemplate}
                     this.addTask(item)
                     this.setCurrentTask(item)
                     this.$router.push({name: 'projectList'})
