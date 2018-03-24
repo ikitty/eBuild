@@ -1,0 +1,16 @@
+* {margin:0;padding:0;list-style:none;}
+
+.mod_header {height:100px;line-height:100px;text-align:center;background:#333;color:#fff;font-size:16px;}
+
+h1 {display:inline-block;vertical-align:middle;width:72px;height:72px;background:url(../images/logo.png);background-size:100%;}
+h2 {display:inline-block;vertical-align:middle;font:400 18px/100px Microsoft yahei;color:#ddd;padding-left:10px;}
+
+.main {width:1000px;margin:0 auto;overflow:hidden;padding-top:20px;}
+.col_main {float:right;width:770px;}
+.col_main .news_hd {height:50px;font:400 20px/50px Arial,Simsun;}
+.col_main .news_bd {margin-left:20px;}
+.col_main li {height:40px;line-height:40px;border-bottom:1px dotted #ddd;padding-left:0px;list-style:disc;}
+
+.col_side {float:left;width:200px;}
+.col_side p {width:100%;height:90px;margin:15px auto;overflow:hidden;background-color:#eee;border:1px solid #ddd;border-radius:5px;}
+.col_side img {display:block;height:100%;margin: 0 auto;}
