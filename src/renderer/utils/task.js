@@ -127,6 +127,9 @@ const startTask = (doBuild = false, task, globalConfig, sendLog, cb)=>{
             .pipe(gulpToUtf8() )
             .pipe(gulpReplace(/(src|href)=('|")https?:\/\//gi, '$1=$2//' ))
 
+
+            //todo checkSyntax 后续迁移到独立模板实现
+
             .pipe(gulpIf( doBuild, gulpReplace(/charset="[\w-]+"/gi, 'charset="gbk"') ,gulpReplace(/charset="\w+"/gi, 'charset="utf-8"') ))
             .pipe(gulpIf( doBuild, gulpReplace('src="images/', 'src="' + imgPrefix) ))
             // utf-8 for dev (browserSync utf8 only), gbk for build
@@ -148,6 +151,9 @@ const startTask = (doBuild = false, task, globalConfig, sendLog, cb)=>{
             1*config.remRatio && ( plugins.push(pxRem({remUnit: config.remRatio})) )
             config.codeMinify && ( plugins.push(cssNano()) )
         }
+
+        //todo : check code with cssLint
+        //后续迁移到check模块中去完成，先在此处做功能验证
 
         gulp.src(paths.src.css, {base: paths.src.dir})
             // for build
