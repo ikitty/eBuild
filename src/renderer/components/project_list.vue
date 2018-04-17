@@ -12,7 +12,7 @@
     <div class="main">
         <div class="btns" @click="removeFocusState">
             <el-button-group>
-                <el-button type="primary" size="medium" @click="localServe">{{localServeStatus ? '停止': '本地'}}预览</el-button>
+                <el-button type="primary" size="medium" @click="localServe">{{serveStatus ? '停止': '开始'}}预览</el-button>
                 <el-button type="primary" size="medium" @click="checkSyntax">检测</el-button>
                 <el-button type="primary" size="medium" @click="buildTask">编译</el-button>
                 <el-button type="primary" size="medium" @click="layerSetShow=true">设置</el-button>
@@ -86,8 +86,7 @@
 
                 textAreaRows: 16, //arg must be Number type 
                 textAreaReadonly: true,
-                logs: [ {cont:'系统初始化完毕', ret: 'ok' } ],
-                localServeStatus: false
+                logs: [ {cont:'系统初始化完毕', ret: 'ok' } ]
 
                 ,transRem: false
                 ,projConfig: {
@@ -103,10 +102,10 @@
             this.renderConfig(this.current_task)
         }
         ,computed: {
-            ...mapGetters(['current_task', 'task_list', 'config'])
+            ...mapGetters(['current_task', 'task_list', 'config', 'serveStatus'])
         }
         ,methods: {
-            ...mapActions(['delTask', 'setCurrentTask', 'updateTask'])
+            ...mapActions(['delTask', 'setCurrentTask', 'updateTask', 'saveServeStatus'])
 
             ,taskItemClick(item){
                 this.setCurrentTask(item)
@@ -132,12 +131,11 @@
             }
             ,localServe(){
                 if (!this.current_task.name ){
-                    this.$alert('choose a task plz :)', '提示');
+                    this.$alert('请先选择一个项目 :)', '提示');
                     return
                 }
-                if (this.localServeStatus) {
+                if (this.serveStatus) {
                     util.stopTask(this.saveLog)
-                    this.localServeStatus = false
                 }else{
                     //todo opt
                     this.saveLog({cont:'~~~~~ Let\'s Go! ~~~~~' })
@@ -146,8 +144,8 @@
                     }else{
                         util.startTask(false, this.current_task, this.config, this.saveLog)
                     }
-                    this.localServeStatus = true
                 }
+                this.saveServeStatus(!this.serveStatus)
             }
             ,saveConfig(){
                 let task = JSON.parse(JSON.stringify(this.current_task))

@@ -20,16 +20,18 @@ import gulpPngQuant from 'gulp-pngquant'
 
 
 let imgPrefix = '//game.gtimg.cn/images/'
+let watchStream = null
 
 //todo 多个bs实例 , 运行前先结束上一个实例
-
 const BS = browserSync.create();
 const startServer = function (rootPath, cb) {
     BS.init({
         server: rootPath,
-        startPath: "/",
+        index: ['index.html', 'index.htm', 'index.shtml'],
+
+        // startPath: "/",
         // startPath: "/html/",
-        port: 8098,
+        port: 9981,
         reloadDelay: 0,
         timestamps: true,
         notify: {      
@@ -43,8 +45,9 @@ const startServer = function (rootPath, cb) {
 }
 
 const stopTask = (sendLog)=>{
+    try { watchStream.close() } catch (error) {console.log('stop watch', error)}
     BS.exit()
-    sendLog({cont: '停止本地预览', ret: 'ok'})
+    sendLog({cont: '停止预览', ret: 'ok'})
 }
 
 const getRelativePath = (path)=>{
@@ -79,8 +82,10 @@ const startTask = (doBuild = false, task, globalConfig, sendLog, cb)=>{
         src: {
             dir: path.join(taskPath, './src'),
             html: path.join(taskPath, './src/*.{html,htm,shtml}'), //glob pattern
-            css: path.join(taskPath, './src/css/**/*'),
-            js: path.join(taskPath, './src/js/**/*'),
+            // css: path.join(taskPath, './src/css/**/*'),
+            css: path.join(taskPath, './src/**/*.css'),
+            // js: path.join(taskPath, './src/js/**/*'),
+            js: path.join(taskPath, './src/**/*.js'),
             img: path.join(taskPath, './src/images/**/*')
         },
         target: {
@@ -198,7 +203,7 @@ const startTask = (doBuild = false, task, globalConfig, sendLog, cb)=>{
 
     //监听文件
     function watch(cb) {
-        gulpWatch([paths.src.dir], {ignored: /[\/\\]\./}, function(arg){
+        watchStream = gulpWatch([paths.src.dir], {ignored: /[\/\\]\./}, function(arg){
             let e = arg.event
             let orgPath = arg.history[0]
 

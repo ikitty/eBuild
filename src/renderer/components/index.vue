@@ -30,7 +30,7 @@ export default {
         ...mapGetters(['task_list'])
     }
     ,methods: {
-        ...mapActions(['addTask'])
+        ...mapActions(['addTask' ,  'setCurrentTask'])
 
         ,applyProject(e){
             let files = e.target.files
@@ -66,11 +66,13 @@ export default {
                             console.log('rm file', 1);
                         });
                         this.addTask(D)
+                        this.setCurrentTask(D)
                         this.$router.push({name: 'projectList'})
                     });
 
             }else {
                 this.addTask(D)
+                this.setCurrentTask(D)
                 this.$router.push({name: 'projectList'})
             }
         }
@@ -90,6 +92,7 @@ export default {
             }
 
             this.addTask(D)
+            this.setCurrentTask(D)
             this.$router.push({name: 'projectList'})
         }
     }

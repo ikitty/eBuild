@@ -20,6 +20,7 @@ const state = {
     ,current_task: defState.current_task || {}
     ,working_dir: defState.working_dir || path.join(os.homedir(), './Desktop/')
     ,config: defState.config || {}
+    ,serveStatus: false
 }
 
 const mutations = {
@@ -51,6 +52,10 @@ const mutations = {
     }
     ,SaveConfig(state, item){
         state.config = item
+        LS.set(state)
+    }
+    ,SaveServeStatus(state, v){
+        state.serveStatus = v
         LS.set(state)
     }
 }
@@ -89,6 +94,12 @@ const actions = {
     ,saveConfig({commit}, item){
         return new Promise((resolve, reject)=>{
             commit('SaveConfig', item)
+            resolve()
+        })
+    }
+    ,saveServeStatus({commit}, item){
+        return new Promise((resolve, reject)=>{
+            commit('SaveServeStatus', item)
             resolve()
         })
     }
