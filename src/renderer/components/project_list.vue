@@ -21,7 +21,7 @@
             <el-button-group>
                 <el-button type="info" size="medium" @click="logs = []" >清屏</el-button>
                 <el-button type="danger" size="medium" @click="removeTask" >删除</el-button>
-                <el-button type="success" size="medium" @click="changeFooter" >Foot</el-button>
+                <!-- <el-button type="success" size="medium" @click="changeFooter" >Foot</el-button> -->
             </el-button-group>
         </div>
         <div class="hide_input_wrap">
@@ -176,21 +176,23 @@
                 util.startTask(true, this.current_task, this.config, this.saveLog)
             }
             ,removeTask(){
-                this.$confirm('此操作将删除项目和对应的文件, 是否继续?', '提示', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    type: 'warning'
-                }).then(() => {
-                    this.saveLog({ cont: '开始删除项目' + this.current_task.name })
-                    util.deleteTask(this.current_task.path).then(()=>{
-                        this.saveLog({ cont: '删除项目' + this.current_task.name, ret: 'ok' })
-                        this.delTask(this.current_task)
-                        this.setCurrentTask(this.task_list[0])
+                this.saveLog({ cont: '删除项目' + this.current_task.name, ret: 'ok' })
+                this.delTask(this.current_task)
+                this.$alert('成功删除: ' + this.current_task.name + '，这并不会删除您本地的文件', '提示');
+                this.setCurrentTask(this.task_list[0])
 
-                    }).catch(err=>{
-                        this.saveLog({cont: '删除项目失败：' + err.message, ret: 'fail'})
-                    })
-                });
+                    // this.saveLog({ cont: '开始删除项目' + this.current_task.name })
+                    // util.deleteTask(this.current_task.path).then(()=>{
+
+                    // }).catch(err=>{ this.saveLog({cont: '删除项目失败：' + err.message, ret: 'fail'})
+                    // })
+
+                // this.$confirm('此操作将删除项目和对应的文件, 是否继续?', '提示', {
+                //     confirmButtonText: '确定',
+                //     cancelButtonText: '取消',
+                //     type: 'warning'
+                // }).then(() => {
+                // });
 
             }
             ,removeFocusState(e){

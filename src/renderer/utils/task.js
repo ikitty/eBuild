@@ -81,7 +81,9 @@ const startTask = (doBuild = false, task, globalConfig, sendLog, cb)=>{
     let paths = {
         src: {
             dir: path.join(taskPath, './src'),
-            html: path.join(taskPath, './src/*.{html,htm,shtml}'), //glob pattern
+            // html: path.join(taskPath, './src/*.{html,htm,shtml}'), //glob pattern
+            //todo test
+            html: path.join(taskPath, './src/**/*.{html,htm,shtml}'), //glob pattern
             // css: path.join(taskPath, './src/css/**/*'),
             css: path.join(taskPath, './src/**/*.css'),
             // js: path.join(taskPath, './src/js/**/*'),
@@ -325,7 +327,7 @@ const startTask = (doBuild = false, task, globalConfig, sendLog, cb)=>{
 
 const serveTask = (task, sendLog, cb = ()=>{} )=>{
     //convert 2 utfe
-    let p = [path.join(task.path, './*.{html,htm,shtml}'), '!' + path.join(task.path, './__*.*')]
+    let p = [path.join(task.path, './**/*.{html,htm,shtml}'), '!' + path.join(task.path, './**/__*.*')]
     gulp.src(p)
         .pipe(gulpRename(function(path){
             path.basename = '__' + path.basename
@@ -346,6 +348,8 @@ const serveTask = (task, sendLog, cb = ()=>{} )=>{
         directory: true
     }, function(){
         sendLog({cont:'启动本地服务器', ret: 'ok'})
+        sendLog({cont:'预览地址: http://localhost:9981/', ret: 'info'})
+        sendLog({cont:'请在浏览器中点击以__开头的文件名进行预览', ret: 'info'})
         cb()
     });
 }

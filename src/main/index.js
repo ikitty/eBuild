@@ -4,6 +4,8 @@ import { app, BrowserWindow } from 'electron'
  * Set `__static` path to static files in production
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
  */
+
+let debug = 0 
 let appWidth = 800
 let appHeight = 550
 
@@ -12,9 +14,10 @@ if (process.env.NODE_ENV !== 'development') {
 
 //dev
 }else{
+    debug = 1
+
     appWidth = 1600    
     appHeight = 1000    
-
     if (process.platform == 'darwin') {
         appWidth = 1100    
         appHeight = 720    
@@ -42,7 +45,7 @@ function createWindow () {
   mainWindow.loadURL(winURL)
 
   //todo for build test
-  mainWindow.webContents.openDevTools();
+//   mainWindow.webContents.openDevTools();
 
 
   mainWindow.on('closed', () => {
