@@ -4,7 +4,10 @@
         <div class="side_hd">项目列表 <span>&gt;&gt;</span></div>
         <div class="side_list_wrap">
             <ul class="side_list">
-                <li v-for="(item, index) in task_list" :key="index" :class="item.name === current_task.name ? 'click' : '' " @click="taskItemClick(item)">&bull;&nbsp; {{item.name}}</li>
+                <li v-for="(item, index) in task_list" :key="index" :class="item.name === current_task.name ? 'click' : '' " @click="taskItemClick(item)">
+                    &bull;&nbsp; {{item.name}}
+                    <i class="el-icon-info" title="打开文件夹" @click="openFolder(item.path)"></i>
+                </li>
             </ul>
         </div>
     </div>
@@ -206,6 +209,14 @@
             ,changeFooter(){
                 util.replaceFooter(this.current_task, this.saveLog)
             }
+            
+            ,openFolder(path){
+                console.log('path', path);
+                if (!path) {
+                    return
+                }
+                this.$electron.shell.openItem(path)
+            }
         }
     }
 </script>
@@ -219,8 +230,9 @@
 
     .side_list_wrap {height:470px;padding-top:10px;overflow-y:scroll;background-color: #fdfdfd;}
     .side_list {padding-left: 15px;}
-    .side_list li {height: 50px;line-height: 50px;border-bottom: 1px dotted #ddd;cursor: pointer;}
+    .side_list li {position: relative; height: 50px;line-height: 50px;border-bottom: 1px dotted #ddd;cursor: pointer;}
     .side_list li.click {color: #39f;cursor: default;}
+    .side_list i {position: absolute;right: 14px; top:18px;color: #333;}
 
     .main {float:left;width: 580px;height: 100%;padding: 20px}
     .btns {padding-bottom: 20px;}
