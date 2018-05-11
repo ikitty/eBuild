@@ -6,7 +6,7 @@
             <ul class="side_list">
                 <li v-for="(item, index) in task_list" :key="index" :class="item.name === current_task.name ? 'click' : '' " @click="taskItemClick(item)">
                     &bull;&nbsp; {{item.name}}
-                    <i class="el-icon-info" title="打开文件夹" @click="openFolder(item.path)"></i>
+                    <i class="el-icon-zoom-in" title="打开文件夹" @click="openFolder(item.path)"></i>
                 </li>
             </ul>
         </div>
@@ -101,8 +101,18 @@
         }
         ,created(){
         }
+        ,beforeRouteEnter(to,from,next){
+            // console.log('before', arguments);
+            next()    
+        }
         ,mounted(){
             this.renderConfig(this.current_task)
+
+            let req = this.$route.query
+            console.log('req', req);
+            if (req.action && req.action == 'create_proj') {
+                this.$alert('eBuild已经按预订模板初始化了项目结构,可点击项目名称右侧的图标查看文件夹,可点击开始预览实时查看页面', '提示');
+            }
         }
         ,computed: {
             ...mapGetters(['current_task', 'task_list', 'config', 'serveStatus'])
@@ -232,7 +242,7 @@
     .side_list {padding-left: 15px;}
     .side_list li {position: relative; height: 50px;line-height: 50px;border-bottom: 1px dotted #ddd;cursor: pointer;}
     .side_list li.click {color: #39f;cursor: default;}
-    .side_list i {position: absolute;right: 14px; top:18px;color: #333;}
+    .side_list i {position: absolute;right: 14px; top:18px;color: #333;cursor: pointer;}
 
     .main {float:left;width: 580px;height: 100%;padding: 20px}
     .btns {padding-bottom: 20px;}

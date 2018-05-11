@@ -87,7 +87,7 @@ export default {
                 return value.name == D.name 
             }
             if (this.task_list.some(inTaskList)){
-                this.$alert('已有同名任务', '提示' );
+                this.$alert('已有同名任务，如有必要可在项目列表中先删除任务再关联', '提示' );
                 return
             }
 

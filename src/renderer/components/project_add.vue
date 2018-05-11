@@ -19,7 +19,7 @@
             </div>
         </div>
         <div class="row">
-            <p class="row_hd">活动名称 (如: a20171013wuxia)</p>
+            <p class="row_hd">活动名称 (如: a20180505wuxia ，将替换图片的分离路径)</p>
             <div class="row_bd">
                 <el-input v-model="taskName" size="medium"></el-input>
             </div>
@@ -80,7 +80,7 @@
 
                 let inTaskList = (value,key)=>{ return value.name == this.taskName }
                 if (this.task_list.some(inTaskList)){
-                    this.$alert('已有同名任务', '提示' );
+                    this.$alert('已有同名任务，如有必要可在项目列表中先删除项目，然后新增项目', '提示' );
                     return
                 }
 
@@ -90,7 +90,7 @@
                     let item = {name: this.taskName, path: path, domain: this.taskDomain, template: this.taskTemplate}
                     this.addTask(item)
                     this.setCurrentTask(item)
-                    this.$router.push({name: 'projectList'})
+                    this.$router.push({name: 'projectList', query: { action: 'create_proj'} })
                 })
             }
             ,choosePath(e){
