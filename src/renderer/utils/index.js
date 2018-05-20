@@ -11,7 +11,12 @@ const templateDict = {
 }
 const createTask = (targetPath, taskTemplate)=> {
     //todo 第一次运行的时候总会有点问题，随便加个注释什么的就正常了。 奇怪
-    let tempPath = path.join(__dirname, '../template/'+ templateDict[taskTemplate]+'/**/*')
+    let tempPath = ''
+    if (templateDict[taskTemplate]) {
+        tempPath = path.join(__dirname, '../template/'+ templateDict[taskTemplate]+'/**/*')
+    }else{
+        tempPath = taskTemplate + '/**/*'
+    }
     console.log('templatePath is ', tempPath);
 
     return new Promise((resolve, reject) => {

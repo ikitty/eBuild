@@ -4,4 +4,5 @@ export default {
     ,working_dir: (state)=> state.Core.working_dir
     ,config: (state)=> state.Core.config
     ,serveStatus: (state)=>state.Core.serveStatus
+    ,tpl: (state)=> state.Core.tpl
 }

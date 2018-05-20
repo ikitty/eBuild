@@ -21,6 +21,7 @@ const state = {
     ,working_dir: defState.working_dir || path.join(os.homedir(), './Desktop/')
     ,config: defState.config || {}
     ,serveStatus: false
+    ,tpl: defState.tpl || []
 }
 
 const mutations = {
@@ -56,6 +57,10 @@ const mutations = {
     }
     ,SaveServeStatus(state, v){
         state.serveStatus = v
+        LS.set(state)
+    }
+    ,AddTpl(state, v){
+        state.tpl.push(v)
         LS.set(state)
     }
 }
@@ -100,6 +105,12 @@ const actions = {
     ,saveServeStatus({commit}, item){
         return new Promise((resolve, reject)=>{
             commit('SaveServeStatus', item)
+            resolve()
+        })
+    }
+    ,addTpl({commit}, task){
+        return new Promise((resolve, reject)=>{
+            commit('AddTpl', task)
             resolve()
         })
     }
