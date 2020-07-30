@@ -222,6 +222,11 @@ const startTask = (doBuild = false, task, globalConfig, sendLog, cb)=>{
         let target = file.split('src')[1].match(/[\/\\](\w+)[\/\\]/);
         target = target && target[1] ? target[1] : 'html'
 
+        var ext = path.extname(file);
+        if (ext == '.css') {
+            target = 'css'
+        }
+
         switch (target) {
             case 'images':
                 if (type === 'unlink') {
